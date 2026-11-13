@@ -159,7 +159,7 @@ def analyze_analogs(req: AnalysisRequest):
     if target not in ["moon", "mars"]:
         raise HTTPException(status_code=400, detail="target_body must be 'moon' or 'mars'")
 
-    # حساب الـ Score ديناميكياً بناءً على عدد الفلاتر المختارة (مكان ربط موديل الـ AI)
+    # حساب الـ Score ديناميكياً بناءً على عدد الفلاتر المختارة
     factor_weight = min(1.0, 0.85 + (len(req.factors) * 0.025))
 
     results = []
@@ -185,17 +185,43 @@ def analyze_analogs(req: AnalysisRequest):
     # ترتيب النتائج من الأعلى تشابهاً للأقل
     results.sort(key=lambda x: x["numeric_score"], reverse=True)
 
+    # حساب قيم ديناميكية للرسم البياني بناءً على الفلاتر المختارة والكوكب
+    active_factors = req.factors if req.factors else ["Terrain", "Geology", "Temperature", "Resources"]
+    
+    factor_scores = {
+        "Topography":  {"earth": 91, "moon": 82, "mars": 89},
+        "Geology":     {"earth": 92, "moon": 84, "mars": 90},
+        "Temperature": {"earth": 85, "moon": 65, "mars": 76},
+        "Terrain":     {"earth": 88, "moon": 78, "mars": 85},
+        "Resources":   {"earth": 90, "moon": 72, "mars": 80},
+        "Environment": {"earth": 87, "moon": 60, "mars": 74},
+    }
+
+    chart_labels = []
+    earth_vals = []
+    moon_vals = []
+    mars_vals = []
+
+    for f in active_factors:
+        if f in factor_scores:
+            chart_labels.append(f)
+            boost = 3 if target == "mars" else -2
+            earth_vals.append(factor_scores[f]["earth"])
+            moon_vals.append(min(99, max(40, factor_scores[f]["moon"] - boost)))
+            mars_vals.append(min(99, max(40, factor_scores[f]["mars"] + boost)))
+
     return {
         "target_body": target,
         "planetary_data": PLANETARY_TRAVERSES[target],
         "earth_analogs": results,
         "comparison_metrics": {
-            "labels": ["Terrain", "Geology", "Temperature", "Resources"],
-            "earth": [88, 92, 85, 90],
-            "moon": [78, 84, 65, 72],
-            "mars": [85, 90, 76, 80]
+            "labels": chart_labels,
+            "earth": earth_vals,
+            "moon": moon_vals,
+            "mars": mars_vals
         }
     }
+
 
 # Endpoint إضافي لقراءة مسار مركبة المريخ الحقيقي من ملف best_interp.csv لو حطيته في الفولدر
 @app.get("/api/mars-traverse")

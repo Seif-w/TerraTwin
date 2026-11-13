@@ -3,316 +3,490 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TerraSpace - Earth to Moon & Mars Analog Finder</title>
+  <title>TerraTwin - Earth to Moon & Mars Analog Finder</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Leaflet Maps CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
     :root {
-      --bg-dark: #060b19;
-      --panel-bg: rgba(15, 23, 42, 0.78);
-      --border-glass: rgba(56, 189, 248, 0.22);
-      --accent-blue: #38bdf8;
-      --accent-orange: #f97316;
-      --accent-purple: #a855f7;
-      --accent-green: #22c55e;
-      --text-main: #f8fafc;
+      --bg-dark: #060913;
+      --card-bg: rgba(15, 22, 42, 0.78);
+      --card-border: rgba(56, 189, 248, 0.22);
+      --text-main: #f1f5f9;
       --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-purple: #818cf8;
+      --accent-orange: #f97316;
+      --accent-green: #22c55e;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
     body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(circle at top right, #1e1b4b, #060b19 60%);
+      background: radial-gradient(circle at top center, #111c3d 0%, #050811 65%);
       color: var(--text-main);
-      display: flex;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Sidebar */
-    .sidebar {
-      width: 220px;
-      background: linear-gradient(180deg, rgba(10, 16, 33, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
-      border-right: 1px solid var(--border-glass);
-      padding: 24px 16px;
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 32px;
+      background: rgba(8, 12, 26, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .logo i { color: var(--accent-blue); font-size: 22px; }
+
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding-bottom: 4px;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: #fff;
+      border-bottom: 2px solid var(--accent-blue);
+    }
+
+    /* Main Grid Layout */
+    .main-container {
+      max-width: 1440px;
+      margin: 22px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+
+    .glass-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Left Sidebar Controls */
+    .sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .target-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .target-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text-muted);
+      padding: 12px 10px;
+      border-radius: 12px;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .brand h1 { font-size: 22px; font-weight: 700; color: #fff; }
-    .brand p { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-
-    .nav-menu { margin-top: 30px; display: flex; flex-direction: column; gap: 8px; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px; padding: 11px 14px;
-      border-radius: 10px; color: var(--text-muted); text-decoration: none;
-      font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s;
-    }
-    .nav-item:hover, .nav-item.active {
-      background: linear-gradient(90deg, rgba(56, 189, 248, 0.25), rgba(56, 189, 248, 0.05));
-      color: #fff; border: 1px solid rgba(56, 189, 248, 0.4);
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.25s;
     }
 
-    .nasa-badge {
-      background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass);
-      border-radius: 12px; padding: 14px; text-align: center;
+    .target-btn.active {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(129, 140, 248, 0.25));
+      border-color: var(--accent-blue);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
     }
-    .nasa-logo {
-      display: inline-block; background: #0b3d91; color: white; font-weight: 900;
-      font-size: 16px; padding: 6px 14px; border-radius: 50%; letter-spacing: 1px;
-      border: 2px solid #fc3d21; margin-bottom: 6px;
-    }
-    .nasa-badge p { font-size: 11px; color: var(--text-muted); }
 
-    /* Main Content */
-    .main { flex: 1; padding: 18px 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
-
-    /* Hero */
-    .hero {
-      position: relative;
-      background: linear-gradient(90deg, rgba(6, 11, 25, 0.88) 0%, rgba(15, 23, 42, 0.55) 50%, rgba(124, 45, 18, 0.65) 100%),
-                  url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=80') center/cover;
-      border: 1px solid var(--border-glass);
-      border-radius: 16px;
-      padding: 22px 28px;
-      text-align: center;
+    .factors-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
-    .user-pill {
-      position: absolute; top: 14px; right: 18px;
-      background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass);
-      padding: 6px 12px; border-radius: 20px; font-size: 12px; color: var(--text-muted);
-    }
-    .hero h2 { font-size: 24px; font-weight: 700; line-height: 1.3; max-width: 650px; margin: 0 auto; }
-    .hero p { font-size: 13px; color: #cbd5e1; margin-top: 6px; }
 
-    /* Glass Panel */
-    .panel {
-      background: var(--panel-bg);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border-glass);
-      border-radius: 14px;
-      padding: 15px 18px;
+    .factor-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #cbd5e1;
+      cursor: pointer;
     }
-    .panel-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; color: #e2e8f0; }
 
-    /* Controls Row */
-    .controls-grid { display: grid; grid-template-columns: 1.2fr 1.5fr 0.8fr; gap: 18px; align-items: center; }
-    .target-cards { display: flex; gap: 12px; }
-    .target-card {
-      flex: 1; background: rgba(30, 41, 59, 0.7); border: 2px solid transparent;
-      border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s;
+    .factor-item input[type="checkbox"] {
+      accent-color: var(--accent-blue);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
     }
-    .target-card.active { border-color: var(--accent-blue); background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 15px rgba(56, 189, 248, 0.25); }
-    .planet-icon { width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 6px; }
-    .moon-orb { background: radial-gradient(circle at 30% 30%, #e2e8f0, #64748b); box-shadow: inset -6px -6px 12px rgba(0,0,0,0.6); }
-    .mars-orb { background: radial-gradient(circle at 30% 30%, #fb923c, #9a3412); box-shadow: inset -6px -6px 12px rgba(0,0,0,0.6); }
-    .target-card span { font-size: 13px; font-weight: 600; }
-
-    .factors-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; }
-    .factor-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; cursor: pointer; }
-    .factor-item input { accent-color: var(--accent-blue); width: 15px; height: 15px; }
 
     .run-btn {
-      width: 100%; padding: 14px 18px; border: none; border-radius: 12px;
-      background: linear-gradient(90deg, #0284c7, #38bdf8); color: white;
-      font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s;
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35);
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #2563eb, #6366f1);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(79, 70, 229, 0.45);
+      transition: transform 0.15s, box-shadow 0.2s;
     }
-    .run-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5); }
 
-    /* Dual Maps + Ranking Grid */
-    .mid-grid { display: grid; grid-template-columns: 1.15fr 1.15fr 0.9fr; gap: 16px; }
-    .map-box { height: 280px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: #020617; z-index: 1; }
-    .map-legend { display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
-    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .run-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 25px rgba(79, 70, 229, 0.65);
+    }
 
-    .ranking-list { display: flex; flex-direction: column; gap: 10px; }
+    .run-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Right Workspace */
+    .workspace { display: flex; flex-direction: column; gap: 20px; }
+
+    /* Dual Maps Row */
+    .maps-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .map-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .map-header h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .map-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .map-box {
+      height: 330px;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1;
+    }
+
+    /* Bottom Analytics Row */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+    }
+
+    .ranking-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+
     .rank-card {
-      display: flex; align-items: center; gap: 10px; background: rgba(30, 41, 59, 0.65);
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 9px;
-      cursor: pointer; transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
     }
-    .rank-card:hover { border-color: var(--accent-blue); background: rgba(30, 41, 59, 0.95); }
-    .rank-img { width: 56px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+
+    .rank-card:hover {
+      border-color: var(--accent-blue);
+      background: rgba(30, 41, 59, 0.85);
+    }
+
+    .rank-img {
+      width: 64px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
     .rank-info { flex: 1; }
-    .rank-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
-    .rank-header h4 { font-size: 12px; font-weight: 600; }
-    .badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; color: white; }
-    .rank-info p { font-size: 11px; color: var(--text-muted); line-height: 1.25; }
+    .rank-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .rank-header h4 { font-size: 14px; font-weight: 600; }
+    .rank-info p { font-size: 12px; color: var(--text-muted); }
 
-    /* Bottom Grid */
-    .bot-grid { display: grid; grid-template-columns: 1.1fr 1.3fr 1fr; gap: 16px; }
-    .insights-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-top: 6px; }
-    .insight-box { background: rgba(30, 41, 59, 0.5); padding: 10px 6px; border-radius: 10px; }
-    .insight-box i { font-size: 18px; color: var(--accent-blue); margin-bottom: 6px; }
-    .insight-box h5 { font-size: 11px; color: #e2e8f0; margin-bottom: 3px; }
-    .insight-box strong { display: block; font-size: 12px; color: #fff; margin-bottom: 2px; }
-    .insight-box span { font-size: 10px; color: var(--text-muted); }
-
-    .about-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
-    .learn-btn {
-      background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent-blue);
-      color: var(--accent-blue); padding: 7px 14px; border-radius: 8px; font-size: 12px;
-      cursor: pointer; font-weight: 600;
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #fff;
     }
 
+    /* Custom Leaflet Pin */
     .custom-pin {
-      width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.9);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    @media (max-width: 1024px) {
+      .main-container { grid-template-columns: 1fr; }
+      .maps-grid, .bottom-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div>
-      <div class="brand">
-        <h1>TerraSpace</h1>
-        <p>Earth to Moon & Mars<br>Analog Finder</p>
-      </div>
-      <nav class="nav-menu">
-        <a class="nav-item active"><i class="fa-solid fa-house"></i> Home</a>
-        <a class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Map</a>
-        <a class="nav-item"><i class="fa-solid fa-chart-column"></i> Analysis</a>
-        <a class="nav-item"><i class="fa-solid fa-database"></i> Data Sources</a>
-        <a class="nav-item"><i class="fa-solid fa-circle-info"></i> About</a>
-      </nav>
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="logo" onclick="switchTab('dashboard', document.querySelector('.nav-links a'))">
+      <i class="fa-solid fa-earth-americas"></i>
+      <span>TerraTwin</span>
     </div>
+    <nav class="nav-links">
+      <a class="active" onclick="switchTab('dashboard', this)">Map Dashboard</a>
+      <a onclick="switchTab('layers', this)">Data Layers</a>
+      <a onclick="switchTab('methodology', this)">Methodology</a>
+      <a onclick="switchTab('about', this)">About</a>
+    </nav>
+  </header>
 
-    <div class="nasa-badge">
-      <div class="nasa-logo">NASA</div>
-      <p>Powered by<br>NASA Open Data</p>
-    </div>
-  </aside>
-
-  <!-- Main Dashboard -->
-  <main class="main">
-    
-    <!-- Hero Banner -->
-    <section class="hero">
-      <div class="user-pill"><i class="fa-solid fa-user-astronaut"></i> Welcome, Explorer ▾</div>
-      <h2>Find the Best Earth Locations<br>that Resemble the Moon or Mars</h2>
-      <p>Explore. Analyze. Discover.</p>
-    </section>
-
-    <!-- Control Bar -->
-    <section class="panel controls-grid">
-      <div>
-        <div class="panel-title"><span><i class="fa-solid fa-crosshairs" style="color: var(--accent-blue);"></i> Select Target Body</span></div>
-        <div class="target-cards">
-          <div class="target-card active" id="btn-moon" onclick="selectTarget('moon')">
-            <div class="planet-icon moon-orb"></div>
-            <span>Moon</span>
-          </div>
-          <div class="target-card" id="btn-mars" onclick="selectTarget('mars')">
-            <div class="planet-icon mars-orb"></div>
-            <span>Mars</span>
-          </div>
+  <!-- TAB 1: MAIN MAP DASHBOARD -->
+  <main id="tab-dashboard" class="main-container tab-section">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="glass-panel">
+        <div class="section-title"><i class="fa-solid fa-crosshairs" style="color: var(--accent-blue);"></i> Select Target Body</div>
+        <div class="target-buttons">
+          <button class="target-btn active" id="btn-moon" onclick="selectTarget('moon')">
+            <i class="fa-solid fa-moon" style="font-size: 18px; color: #a855f7;"></i>
+            Moon
+          </button>
+          <button class="target-btn" id="btn-mars" onclick="selectTarget('mars')">
+            <i class="fa-solid fa-globe" style="font-size: 18px; color: #f97316;"></i>
+            Mars
+          </button>
         </div>
-      </div>
 
-      <div>
-        <div class="panel-title"><span><i class="fa-solid fa-filter" style="color: var(--accent-blue);"></i> Analysis Factors</span></div>
+        <div class="section-title" style="margin-top: 22px;"><i class="fa-solid fa-sliders" style="color: var(--accent-purple);"></i> Analysis Factors</div>
         <div class="factors-grid">
           <label class="factor-item"><input type="checkbox" checked> Topography</label>
-          <label class="factor-item"><input type="checkbox" checked> Terrain</label>
           <label class="factor-item"><input type="checkbox" checked> Geology</label>
-          <label class="factor-item"><input type="checkbox" checked> Resources</label>
           <label class="factor-item"><input type="checkbox" checked> Temperature</label>
+          <label class="factor-item"><input type="checkbox" checked> Terrain</label>
+          <label class="factor-item"><input type="checkbox" checked> Resources</label>
           <label class="factor-item"><input type="checkbox" checked> Environment</label>
         </div>
-      </div>
 
-      <div>
-        <button class="run-btn" onclick="runAnalysis()">
-          <i class="fa-solid fa-magnifying-glass"></i> Run Analysis →
+        <button class="run-btn" style="margin-top: 22px;" onclick="runAnalysis()">
+          <i class="fa-solid fa-magnifying-glass"></i> Run Analysis &rarr;
         </button>
       </div>
-    </section>
 
-    <!-- Dual Maps (Planetary + Earth) & Ranking -->
-    <section class="mid-grid">
-      
-      <!-- 1. Moon / Mars Surface Map -->
-      <div class="panel">
-        <div class="panel-title">
-          <span id="planetMapTitle"><i class="fa-solid fa-moon" style="color: var(--accent-purple);"></i> Moon Surface Map</span>
-          <span id="planetSiteBadge" style="font-size: 11px; color: var(--accent-blue);">Apollo 17 & Artemis</span>
-        </div>
-        <div id="planetMap" class="map-box"></div>
-        <div class="map-legend">
-          <span><i class="dot" style="background: #38bdf8;"></i>Rover Traverse</span>
-          <span><i class="dot" style="background: #facc15;"></i>Landing / Base Site</span>
-        </div>
+      <div class="glass-panel" style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+        <div class="section-title"><i class="fa-solid fa-database" style="color: var(--accent-green);"></i> Active Datasets</div>
+        <p>• NASA PDS Mars 2020 Rover Traverses</p>
+        <p>• Apollo 15 & 17 Analyst's Notebook</p>
+        <p>• LRO LOLA & Diviner Thermal Data</p>
+        <p>• SRTM & Copernicus Earth DEM</p>
       </div>
+    </aside>
 
-      <!-- 2. Earth Analog Locations Map -->
-      <div class="panel">
-        <div class="panel-title">
-          <span><i class="fa-solid fa-earth-americas" style="color: var(--accent-green);"></i> Earth Analog Locations</span>
-          <span style="font-size: 11px; color: var(--text-muted);">Satellite View</span>
-        </div>
-        <div id="earthMap" class="map-box"></div>
-        <div class="map-legend">
-          <span><i class="dot" style="background: var(--accent-orange);"></i>Mars Analog</span>
-          <span><i class="dot" style="background: var(--accent-purple);"></i>Moon Analog</span>
-          <span><i class="dot" style="background: var(--accent-green);"></i>High Similarity</span>
-        </div>
-      </div>
-
-      <!-- 3. Results Ranking -->
-      <div class="panel">
-        <div class="panel-title"><span><i class="fa-solid fa-trophy" style="color: #facc15;"></i> Results Ranking</span></div>
-        <div class="ranking-list" id="rankingList"></div>
-      </div>
-
-    </section>
-
-    <!-- Bottom Insights, Chart & About -->
-    <section class="bot-grid">
-      <div class="panel">
-        <div class="panel-title"><span><i class="fa-solid fa-chart-simple" style="color: var(--accent-blue);"></i> Key Insights</span></div>
-        <div class="insights-row">
-          <div class="insight-box">
-            <i class="fa-solid fa-temperature-half"></i>
-            <h5>Temperature Range</h5>
-            <strong>-70°C to 50°C</strong>
-            <span>(similar to Moon & Mars)</span>
+    <!-- Right Main Workspace -->
+    <section class="workspace">
+      <!-- Dual Maps -->
+      <div class="maps-grid">
+        <!-- Planetary Map -->
+        <div class="glass-panel map-card">
+          <div class="map-header">
+            <h3 id="planetMapTitle"><i class="fa-solid fa-moon" style="color: #a855f7;"></i> Moon Surface Map</h3>
+            <span class="map-tag" id="planetSiteBadge">Apollo 17 & South Pole</span>
           </div>
-          <div class="insight-box">
-            <i class="fa-solid fa-mountain"></i>
-            <h5>Elevation Range</h5>
-            <strong>-450 m to 6,500 m</strong>
-            <span>(ideal for varied terrain)</span>
+          <div id="planetMap" class="map-box"></div>
+        </div>
+
+        <!-- Earth Map -->
+        <div class="glass-panel map-card">
+          <div class="map-header">
+            <h3><i class="fa-solid fa-earth-africa" style="color: #38bdf8;"></i> Earth Analog Sites</h3>
+            <span class="map-tag">Global Similarity Match</span>
           </div>
-          <div class="insight-box">
-            <i class="fa-solid fa-droplet"></i>
-            <h5>Water / Ice Presence</h5>
-            <strong>in Polar Regions</strong>
-            <span>(potential resources)</span>
+          <div id="earthMap" class="map-box"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Panels -->
+      <div class="bottom-grid">
+        <!-- Top Earth Analog Matches -->
+        <div class="glass-panel">
+          <div class="map-header">
+            <h3><i class="fa-solid fa-ranking-star" style="color: #facc15;"></i> Top Earth Analog Matches</h3>
+            <span style="font-size: 12px; color: var(--text-muted);">Click site to fly on map</span>
+          </div>
+          <div class="ranking-list" id="rankingList">
+            <!-- Populated dynamically by JS -->
           </div>
         </div>
-      </div>
 
-      <div class="panel">
-        <div class="panel-title"><span><i class="fa-solid fa-chart-line" style="color: var(--accent-blue);"></i> Comparison Overview</span></div>
-        <canvas id="comparisonChart" height="125"></canvas>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title"><span><i class="fa-solid fa-lightbulb" style="color: #facc15;"></i> About This Project</span></div>
-        <p class="about-text">
-          TerraSpace helps identify Earth locations that analog the permanent Moon and Mars bases, using NASA PDS data, AI analysis, and dual planetary mapping.
-        </p>
-        <button class="learn-btn" onclick="alert('Built for 2026 NASA Space Apps Challenge using PDS & OpenTopography Data!')">Learn More →</button>
+        <!-- Similarity Comparison Chart -->
+        <div class="glass-panel">
+          <div class="map-header" style="margin-bottom: 12px;">
+            <h3><i class="fa-solid fa-chart-column" style="color: var(--accent-blue);"></i> Similarity Comparison</h3>
+            <span style="font-size: 12px; color: var(--text-muted);">Multi-Factor Score (%)</span>
+          </div>
+          <canvas id="comparisonChart" height="190"></canvas>
+        </div>
       </div>
     </section>
-
   </main>
+
+  <!-- TAB 2: DATA LAYERS -->
+  <section id="tab-layers" class="main-container tab-section" style="display: none; grid-template-columns: 1fr;">
+    <div class="glass-panel" style="padding: 28px;">
+      <h2 style="margin-bottom: 8px;"><i class="fa-solid fa-layer-group" style="color: #38bdf8;"></i> NASA & Copernicus Geospatial Data Layers</h2>
+      <p style="color: var(--text-muted); margin-bottom: 24px;">Active remote sensing and planetary datasets feeding the TerraTwin analog matching engine.</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div class="rank-card" style="cursor: default; flex-direction: column; align-items: flex-start;">
+          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+            <h4><i class="fa-solid fa-satellite" style="color:#f97316;"></i> Mars MOLA & Perseverance</h4>
+            <span class="badge" style="background:#22c55e;">Active</span>
+          </div>
+          <p style="margin-top:8px;">Mars Orbiter Laser Altimeter (elevation/slope) & Mars 2020 Jezero Crater localization traverses (best_interp.csv).</p>
+        </div>
+
+        <div class="rank-card" style="cursor: default; flex-direction: column; align-items: flex-start;">
+          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+            <h4><i class="fa-solid fa-moon" style="color:#a855f7;"></i> Lunar LRO LOLA & Diviner</h4>
+            <span class="badge" style="background:#22c55e;">Active</span>
+          </div>
+          <p style="margin-top:8px;">High-resolution lunar topography, surface roughness, and thermal radiometer extremes for Apollo 17 & South Pole.</p>
+        </div>
+
+        <div class="rank-card" style="cursor: default; flex-direction: column; align-items: flex-start;">
+          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+            <h4><i class="fa-solid fa-earth-africa" style="color:#38bdf8;"></i> NASA SRTM & MODIS</h4>
+            <span class="badge" style="background:#22c55e;">Active</span>
+          </div>
+          <p style="margin-top:8px;">30m Shuttle Radar Topography Mission elevation models, land surface temperature, and aridity indices.</p>
+        </div>
+
+        <div class="rank-card" style="cursor: default; flex-direction: column; align-items: flex-start;">
+          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+            <h4><i class="fa-solid fa-mountain" style="color:#facc15;"></i> Copernicus DEM</h4>
+            <span class="badge" style="background:#22c55e;">Active</span>
+          </div>
+          <p style="margin-top:8px;">Global digital surface model used to compute terrain ruggedness index (TRI) and slope stability.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: METHODOLOGY -->
+  <section id="tab-methodology" class="main-container tab-section" style="display: none; grid-template-columns: 1fr;">
+    <div class="glass-panel" style="padding: 28px;">
+      <h2 style="margin-bottom: 8px;"><i class="fa-solid fa-brain" style="color: #a855f7;"></i> Analog Similarity Methodology</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px;">How TerraTwin scores terrestrial locations against extraterrestrial target zones.</p>
+      
+      <div style="display: grid; gap: 16px;">
+        <div class="rank-card" style="cursor: default;">
+          <div class="rank-info">
+            <h4>1. Feature Extraction & Normalization</h4>
+            <p>Raw planetary elevation (MOLA/LOLA) and Earth DEM rasters are converted into slope gradients, surface roughness, and thermal amplitude vectors normalized to [0, 1].</p>
+          </div>
+        </div>
+        <div class="rank-card" style="cursor: default;">
+          <div class="rank-info">
+            <h4>2. Multi-Factor Weighted Scoring Engine</h4>
+            <p>FastAPI backend dynamically weights user-selected parameters (Topography, Geology, Temperature, Terrain, Resources, Environment) using cosine & Euclidean feature similarity.</p>
+          </div>
+        </div>
+        <div class="rank-card" style="cursor: default;">
+          <div class="rank-info">
+            <h4>3. Mission Readiness Ranking</h4>
+            <p>Candidate sites are ranked by overall similarity percentage and operational accessibility for rover testing, EVA simulation, and ISRU (In-Situ Resource Utilization).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: ABOUT -->
+  <section id="tab-about" class="main-container tab-section" style="display: none; grid-template-columns: 1fr;">
+    <div class="glass-panel" style="padding: 28px;">
+      <h2 style="margin-bottom: 8px;"><i class="fa-solid fa-rocket" style="color: #f97316;"></i> About TerraTwin</h2>
+      <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 18px;">
+        <strong>TerraTwin</strong> is an Earth-to-Moon & Mars terrestrial analog discovery platform built for the <strong>2026 NASA Space Apps Challenge</strong>. Before sending astronauts or rovers to the Moon or Mars, space agencies test hardware and habitats in Earth environments that mimic extraterrestrial geology and climate.
+      </p>
+      <div class="rank-card" style="cursor: default; border-color: rgba(249, 115, 22, 0.4);">
+        <div class="rank-info">
+          <h4 style="color: #fb923c;">🇪🇬 Featured Case Study: Egypt's Western Desert</h4>
+          <p style="margin-top: 6px; line-height: 1.6;">
+            Our analysis highlights Egypt's Western Desert (White & Black Desert regions) as a premier Mars analog (97.1% similarity score), combining hyper-arid conditions, basaltic volcanic formations, and wind-eroded sedimentary terrains ideal for rover mobility and habitat testing.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script>
     // 1. Initialize Planetary Map (Moon / Mars)
@@ -340,7 +514,6 @@
       document.getElementById('btn-mars').classList.toggle('active', planet === 'mars');
     }
 
-    // قراءة الفلاتر اللي المستخدم معلم عليها
     function getSelectedFactors() {
       const checkboxes = document.querySelectorAll('.factors-grid input[type="checkbox"]');
       const selected = [];
@@ -352,7 +525,7 @@
       return selected;
     }
 
-    // 3. الربط الفعلي مع الباك إند (FastAPI)
+    // 3. Connect to FastAPI Backend
     async function runAnalysis() {
       const btn = document.querySelector('.run-btn');
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
@@ -371,7 +544,7 @@
         if (!response.ok) throw new Error('API Error');
         const data = await response.json();
 
-        // A. تحديث خريطة الكوكب (Moon أو Mars)
+        // A. Update Planetary Map
         const pData = data.planetary_data;
         document.getElementById('planetMapTitle').innerHTML = `<i class="fa-solid ${selectedPlanet === 'moon' ? 'fa-moon' : 'fa-globe'}" style="color: ${selectedPlanet === 'moon' ? '#a855f7' : '#f97316'};"></i> ${pData.title}`;
         document.getElementById('planetSiteBadge').innerText = pData.badge;
@@ -396,7 +569,7 @@
 
         L.polyline(traverseCoords, { color: '#38bdf8', weight: 3, dashArray: '6, 6' }).addTo(planetMarkersLayer);
 
-        // B. تحديث خريطة الأرض وقائمة الترتيب من رد الباك إند
+        // B. Update Earth Map & Ranking Cards
         earthMarkersLayer.clearLayers();
         const rankingContainer = document.getElementById('rankingList');
         rankingContainer.innerHTML = '';
@@ -434,14 +607,14 @@
 
         earthMap.flyTo([15, 0], 1);
 
-        // C. تحديث الرسم البياني
+        // C. Update Comparison Chart
         updateChart(data.comparison_metrics);
 
       } catch (err) {
         console.error(err);
         alert('تأكد إن سيرفر الباك إند شغال على http://127.0.0.1:8000');
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Run Analysis →';
+        btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Run Analysis &rarr;';
         btn.disabled = false;
       }
     }
@@ -470,6 +643,25 @@
         }
       });
     }
+
+    function switchTab(tabName, el) {
+      document.querySelectorAll('.tab-section').forEach(sec => sec.style.display = 'none');
+      
+      const target = document.getElementById('tab-' + tabName);
+      target.style.display = (tabName === 'dashboard') ? 'grid' : 'block';
+
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      if (tabName === 'dashboard') {
+        setTimeout(() => {
+          planetMap.invalidateSize();
+          earthMap.invalidateSize();
+        }, 100);
+      }
+    }
+
+    // Run initial analysis on page load
     runAnalysis();
   </script>
 </body>
