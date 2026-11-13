@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TerraTwin - Earth to Moon & Mars Analog Finder</title>
+  <title>TerraTwin - 3D Earth to Moon & Mars Analog Finder</title>
 
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Leaflet Maps CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- 3D Globe.gl (Three.js WebGL) -->
+  <script src="https://unpkg.com/globe.gl"></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -193,10 +192,10 @@
     /* Right Workspace */
     .workspace { display: flex; flex-direction: column; gap: 20px; }
 
-    /* Dual Maps Row */
+    /* Dual 3D Globes Row */
     .maps-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 20px;
     }
 
@@ -205,6 +204,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      overflow: hidden;
     }
 
     .map-header {
@@ -223,13 +223,30 @@
       border: 1px solid rgba(56, 189, 248, 0.3);
     }
 
-    .map-box {
-      height: 330px;
+    .globe-box {
+      height: 340px;
       width: 100%;
       border-radius: 12px;
       overflow: hidden;
+      background: radial-gradient(circle at center, #090e1f 0%, #02040a 100%);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      z-index: 1;
+      position: relative;
+      cursor: grab;
+    }
+
+    .globe-box:active { cursor: grabbing; }
+
+    .globe-hint {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.55);
+      background: rgba(0, 0, 0, 0.55);
+      padding: 3px 8px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 10;
     }
 
     /* Bottom Analytics Row */
@@ -279,15 +296,6 @@
       color: #fff;
     }
 
-    /* Custom Leaflet Pin */
-    .custom-pin {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-    }
-
     @media (max-width: 1024px) {
       .main-container { grid-template-columns: 1fr; }
       .maps-grid, .bottom-grid { grid-template-columns: 1fr; }
@@ -303,14 +311,14 @@
       <span>TerraTwin</span>
     </div>
     <nav class="nav-links">
-      <a class="active" onclick="switchTab('dashboard', this)">Map Dashboard</a>
+      <a class="active" onclick="switchTab('dashboard', this)">3D Globe Dashboard</a>
       <a onclick="switchTab('layers', this)">Data Layers</a>
       <a onclick="switchTab('methodology', this)">Methodology</a>
       <a onclick="switchTab('about', this)">About</a>
     </nav>
   </header>
 
-  <!-- TAB 1: MAIN MAP DASHBOARD -->
+  <!-- TAB 1: MAIN 3D GLOBE DASHBOARD -->
   <main id="tab-dashboard" class="main-container tab-section">
     <!-- Left Sidebar -->
     <aside class="sidebar">
@@ -353,24 +361,28 @@
 
     <!-- Right Main Workspace -->
     <section class="workspace">
-      <!-- Dual Maps -->
+      <!-- Dual 3D Globes -->
       <div class="maps-grid">
-        <!-- Planetary Map -->
+        <!-- Planetary 3D Globe -->
         <div class="glass-panel map-card">
           <div class="map-header">
-            <h3 id="planetMapTitle"><i class="fa-solid fa-moon" style="color: #a855f7;"></i> Moon Surface Map</h3>
+            <h3 id="planetMapTitle"><i class="fa-solid fa-moon" style="color: #a855f7;"></i> 3D Moon Globe</h3>
             <span class="map-tag" id="planetSiteBadge">Apollo 17 & South Pole</span>
           </div>
-          <div id="planetMap" class="map-box"></div>
+          <div id="planetGlobe" class="globe-box">
+            <span class="globe-hint"><i class="fa-solid fa-arrows-rotate"></i> Drag to rotate • Scroll to zoom</span>
+          </div>
         </div>
 
-        <!-- Earth Map -->
+        <!-- Earth 3D Globe -->
         <div class="glass-panel map-card">
           <div class="map-header">
-            <h3><i class="fa-solid fa-earth-africa" style="color: #38bdf8;"></i> Earth Analog Sites</h3>
+            <h3><i class="fa-solid fa-earth-africa" style="color: #38bdf8;"></i> 3D Earth Analog Globe</h3>
             <span class="map-tag">Global Similarity Match</span>
           </div>
-          <div id="earthMap" class="map-box"></div>
+          <div id="earthGlobe" class="globe-box">
+            <span class="globe-hint"><i class="fa-solid fa-arrows-rotate"></i> Drag to rotate • Scroll to zoom</span>
+          </div>
         </div>
       </div>
 
@@ -380,7 +392,7 @@
         <div class="glass-panel">
           <div class="map-header">
             <h3><i class="fa-solid fa-ranking-star" style="color: #facc15;"></i> Top Earth Analog Matches</h3>
-            <span style="font-size: 12px; color: var(--text-muted);">Click site to fly on map</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Click site to rotate & zoom 3D globe</span>
           </div>
           <div class="ranking-list" id="rankingList">
             <!-- Populated dynamically by JS -->
@@ -489,21 +501,163 @@
   </section>
 
   <script>
-    // 1. Initialize Planetary Map (Moon / Mars)
-    const planetMap = L.map('planetMap').setView([20.19, 30.77], 3);
-    
-    const moonTileUrl = 'https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-moon-basemap-v0-1/all/{z}/{x}/{y}.png';
-    const marsTileUrl = 'https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-mars-basemap-v0-2/all/{z}/{x}/{y}.png';
+    // 1. Procedural High-Res Textures for Moon & Mars (Zero external failure)
+    function createPlanetaryTexture(type) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
 
-    let planetTileLayer = L.tileLayer(moonTileUrl, { maxZoom: 7, attribution: 'NASA / OpenPlanetary' }).addTo(planetMap);
-    let planetMarkersLayer = L.layerGroup().addTo(planetMap);
+      if (type === 'moon') {
+        ctx.fillStyle = '#8b8d91';
+        ctx.fillRect(0, 0, 1024, 512);
 
-    // 2. Initialize Earth Map
-    const earthMap = L.map('earthMap').setView([15, 0], 1);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri'
-    }).addTo(earthMap);
-    let earthMarkersLayer = L.layerGroup().addTo(earthMap);
+        for (let i = 0; i < 18; i++) {
+          const x = Math.random() * 1024;
+          const y = Math.random() * 512;
+          const r = 40 + Math.random() * 90;
+          const grad = ctx.createRadialGradient(x, y, 5, x, y, r);
+          grad.addColorStop(0, 'rgba(55, 58, 64, 0.75)');
+          grad.addColorStop(1, 'rgba(139, 141, 145, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for (let i = 0; i < 220; i++) {
+          const x = Math.random() * 1024;
+          const y = Math.random() * 512;
+          const r = 2 + Math.random() * 16;
+          ctx.strokeStyle = 'rgba(220, 224, 230, 0.45)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(65, 68, 74, 0.4)';
+          ctx.beginPath();
+          ctx.arc(x + 1, y + 1, r * 0.85, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        const baseGrad = ctx.createLinearGradient(0, 0, 0, 512);
+        baseGrad.addColorStop(0, '#d97742');
+        baseGrad.addColorStop(0.5, '#b84a27');
+        baseGrad.addColorStop(1, '#c96234');
+        ctx.fillStyle = baseGrad;
+        ctx.fillRect(0, 0, 1024, 512);
+
+        for (let i = 0; i < 35; i++) {
+          const x = Math.random() * 1024;
+          const y = 40 + Math.random() * 430;
+          const r = 25 + Math.random() * 85;
+          const grad = ctx.createRadialGradient(x, y, 5, x, y, r);
+          grad.addColorStop(0, 'rgba(78, 32, 18, 0.65)');
+          grad.addColorStop(1, 'rgba(184, 74, 39, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for (let i = 0; i < 120; i++) {
+          const x = Math.random() * 1024;
+          const y = 40 + Math.random() * 430;
+          const r = 2 + Math.random() * 12;
+          ctx.strokeStyle = 'rgba(245, 165, 120, 0.35)';
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = 'rgba(248, 250, 252, 0.85)';
+        ctx.fillRect(0, 0, 1024, 18);
+        ctx.fillRect(0, 494, 1024, 18);
+      }
+
+      return canvas.toDataURL('image/jpeg', 0.9);
+    }
+
+    const TEXTURES = {
+      moon: createPlanetaryTexture('moon'),
+      moonBump: null,
+      mars: createPlanetaryTexture('mars'),
+      earth: 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+      earthBump: 'https://unpkg.com/three-globe/example/img/earth-topology.png'
+    };
+
+    const planetContainer = document.getElementById('planetGlobe');
+    const earthContainer = document.getElementById('earthGlobe');
+
+    function getBoxWidth(el) {
+      return el.getBoundingClientRect().width || 450;
+    }
+
+    // 2. Initialize 3D Planetary Globe (Left)
+    const planetGlobe = Globe()
+      (planetContainer)
+      .width(getBoxWidth(planetContainer))
+      .height(340)
+      .backgroundColor('rgba(0,0,0,0)')
+      .globeImageUrl(TEXTURES.moon)
+      .bumpImageUrl(TEXTURES.moonBump)
+      .showAtmosphere(false)
+      .pointColor(() => '#facc15')
+      .pointAltitude(0.03)
+      .pointRadius(0.65)
+      .pointLabel(d => `<div style="background:rgba(15,23,42,0.9);padding:6px 10px;border-radius:8px;border:1px solid #facc15;color:#fff;font-size:12px;">
+        <b>${d.name}</b><br><span style="color:#cbd5e1;">${d.info}</span>
+      </div>`)
+      .arcsData([])
+      .arcColor(() => '#38bdf8')
+      .arcDashLength(0.4)
+      .arcDashGap(0.2)
+      .arcDashAnimateTime(1500);
+
+    planetGlobe.controls().autoRotate = true;
+    planetGlobe.controls().autoRotateSpeed = 0.8;
+
+    // 3. Initialize 3D Earth Globe (Right)
+    const earthGlobe = Globe()
+      (earthContainer)
+      .width(getBoxWidth(earthContainer))
+      .height(340)
+      .backgroundColor('rgba(0,0,0,0)')
+      .globeImageUrl(TEXTURES.earth)
+      .bumpImageUrl(TEXTURES.earthBump)
+      .showAtmosphere(true)
+      .atmosphereColor('#38bdf8')
+      .atmosphereAltitude(0.18)
+      .pointColor(d => d.color)
+      .pointAltitude(0.04)
+      .pointRadius(0.7)
+      .pointLabel(d => `<div style="background:rgba(15,23,42,0.92);padding:8px 12px;border-radius:8px;border:1px solid ${d.color};color:#fff;font-size:12px;">
+        <b>${d.name}</b> <span style="background:${d.badgeColor};padding:2px 6px;border-radius:4px;font-weight:bold;">${d.score}</span><br>
+        <span style="color:#94a3b8;">Elev: ${d.elevation_m}m | Temp: ${d.temp_range}</span>
+      </div>`)
+      .ringsData([])
+      .ringColor(d => d.color)
+      .ringMaxRadius(4)
+      .ringPropagationSpeed(2)
+      .ringRepeatPeriod(1200);
+
+    earthGlobe.controls().autoRotate = true;
+    earthGlobe.controls().autoRotateSpeed = 0.7;
+
+    [planetGlobe, earthGlobe].forEach(g => {
+      g.controls().addEventListener('start', () => { g.controls().autoRotate = false; });
+    });
+
+    function resizeGlobes() {
+      const pW = getBoxWidth(planetContainer);
+      const eW = getBoxWidth(earthContainer);
+      if (pW > 50) planetGlobe.width(pW).height(340);
+      if (eW > 50) earthGlobe.width(eW).height(340);
+    }
+
+    window.addEventListener('resize', resizeGlobes);
+    setTimeout(resizeGlobes, 200);
 
     let selectedPlanet = 'moon';
     let comparisonChart = null;
@@ -518,14 +672,12 @@
       const checkboxes = document.querySelectorAll('.factors-grid input[type="checkbox"]');
       const selected = [];
       checkboxes.forEach(cb => {
-        if (cb.checked) {
-          selected.push(cb.parentElement.textContent.trim());
-        }
+        if (cb.checked) selected.push(cb.parentElement.textContent.trim());
       });
       return selected;
     }
 
-    // 3. Connect to FastAPI Backend
+    // 4. Connect to FastAPI Backend
     async function runAnalysis() {
       const btn = document.querySelector('.run-btn');
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
@@ -544,52 +696,60 @@
         if (!response.ok) throw new Error('API Error');
         const data = await response.json();
 
-        // A. Update Planetary Map
+        // A. Update 3D Planetary Globe
         const pData = data.planetary_data;
-        document.getElementById('planetMapTitle').innerHTML = `<i class="fa-solid ${selectedPlanet === 'moon' ? 'fa-moon' : 'fa-globe'}" style="color: ${selectedPlanet === 'moon' ? '#a855f7' : '#f97316'};"></i> ${pData.title}`;
+        document.getElementById('planetMapTitle').innerHTML = `<i class="fa-solid ${selectedPlanet === 'moon' ? 'fa-moon' : 'fa-globe'}" style="color: ${selectedPlanet === 'moon' ? '#a855f7' : '#f97316'};"></i> 3D ${selectedPlanet === 'moon' ? 'Moon' : 'Mars'} Globe`;
         document.getElementById('planetSiteBadge').innerText = pData.badge;
 
-        planetTileLayer.setUrl(selectedPlanet === 'moon' ? moonTileUrl : marsTileUrl);
-        planetMarkersLayer.clearLayers();
-        planetMap.setView(pData.center, pData.zoom);
+        if (selectedPlanet === 'moon') {
+          planetGlobe
+            .globeImageUrl(TEXTURES.moon)
+            .bumpImageUrl(null)
+            .showAtmosphere(false);
+        } else {
+          planetGlobe
+            .globeImageUrl(TEXTURES.mars)
+            .bumpImageUrl(null)
+            .showAtmosphere(true)
+            .atmosphereColor('#f97316')
+            .atmosphereAltitude(0.14);
+        }
 
-        const traverseCoords = [];
-        pData.sites.forEach(s => {
-          traverseCoords.push([s.lat, s.lng]);
-          const pIcon = L.divIcon({
-            className: '',
-            html: `<div class="custom-pin" style="background:#facc15;"></div>`,
-            iconSize: [16, 16], iconAnchor: [8, 8]
+        planetGlobe.pointsData(pData.sites);
+        const arcs = [];
+        for (let i = 0; i < pData.sites.length - 1; i++) {
+          arcs.push({
+            startLat: pData.sites[i].lat,
+            startLng: pData.sites[i].lng,
+            endLat: pData.sites[i + 1].lat,
+            endLng: pData.sites[i + 1].lng
           });
-          L.marker([s.lat, s.lng], { icon: pIcon })
-            .addTo(planetMarkersLayer)
-            .bindTooltip(`<b>${s.name}</b>`, { permanent: true, direction: 'top', offset: [0, -8] })
-            .bindPopup(`<b>${s.name}</b><br>${s.info}`);
-        });
+        }
+        planetGlobe.arcsData(arcs);
+        planetGlobe.pointOfView({ lat: pData.center[0], lng: pData.center[1], altitude: 2.0 }, 1200);
+        planetGlobe.controls().autoRotate = true;
 
-        L.polyline(traverseCoords, { color: '#38bdf8', weight: 3, dashArray: '6, 6' }).addTo(planetMarkersLayer);
+        // B. Update 3D Earth Globe & Ranking Cards
+        earthGlobe
+          .pointsData(data.earth_analogs)
+          .ringsData(data.earth_analogs.slice(0, 3));
 
-        // B. Update Earth Map & Ranking Cards
-        earthMarkersLayer.clearLayers();
+        const topMatch = data.earth_analogs[0];
+        if (topMatch) {
+          earthGlobe.pointOfView({ lat: topMatch.lat, lng: topMatch.lng, altitude: 1.8 }, 1400);
+        }
+
         const rankingContainer = document.getElementById('rankingList');
         rankingContainer.innerHTML = '';
 
         data.earth_analogs.forEach((loc, index) => {
-          const icon = L.divIcon({
-            className: '',
-            html: `<div class="custom-pin" style="background:${loc.color};"></div>`,
-            iconSize: [16, 16], iconAnchor: [8, 8]
-          });
-
-          L.marker([loc.lat, loc.lng], { icon })
-            .addTo(earthMarkersLayer)
-            .bindTooltip(`<b>${loc.short}</b> (${loc.score})`, { permanent: true, direction: 'right', offset: [8, 0] })
-            .bindPopup(`<b>${loc.name}</b><br>Elevation: ${loc.elevation_m}m | Temp: ${loc.temp_range}`);
-
           if (index < 3) {
             const card = document.createElement('div');
             card.className = 'rank-card';
-            card.onclick = () => earthMap.flyTo([loc.lat, loc.lng], 6);
+            card.onclick = () => {
+              earthGlobe.controls().autoRotate = false;
+              earthGlobe.pointOfView({ lat: loc.lat, lng: loc.lng, altitude: 0.9 }, 1200);
+            };
             card.innerHTML = `
               <img src="${loc.img}" class="rank-img" alt="${loc.name}">
               <div class="rank-info">
@@ -605,10 +765,9 @@
           }
         });
 
-        earthMap.flyTo([15, 0], 1);
-
         // C. Update Comparison Chart
         updateChart(data.comparison_metrics);
+        resizeGlobes();
 
       } catch (err) {
         console.error(err);
@@ -654,14 +813,10 @@
       if (el) el.classList.add('active');
 
       if (tabName === 'dashboard') {
-        setTimeout(() => {
-          planetMap.invalidateSize();
-          earthMap.invalidateSize();
-        }, 100);
+        setTimeout(resizeGlobes, 100);
       }
     }
 
-    // Run initial analysis on page load
     runAnalysis();
   </script>
 </body>
