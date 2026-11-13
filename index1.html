@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TerraSpace - Earth to Moon & Mars Analog Finder</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-dark: #060b19;
+      --panel-bg: rgba(15, 23, 42, 0.78);
+      --border-glass: rgba(56, 189, 248, 0.22);
+      --accent-blue: #38bdf8;
+      --accent-orange: #f97316;
+      --accent-purple: #a855f7;
+      --accent-green: #22c55e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at top right, #1e1b4b, #060b19 60%);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: linear-gradient(180deg, rgba(10, 16, 33, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border-right: 1px solid var(--border-glass);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .brand h1 { font-size: 22px; font-weight: 700; color: #fff; }
+    .brand p { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    .nav-menu { margin-top: 30px; display: flex; flex-direction: column; gap: 8px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+      border-radius: 10px; color: var(--text-muted); text-decoration: none;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.25), rgba(56, 189, 248, 0.05));
+      color: #fff; border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
+    .nasa-badge {
+      background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass);
+      border-radius: 12px; padding: 14px; text-align: center;
+    }
+    .nasa-logo {
+      display: inline-block; background: #0b3d91; color: white; font-weight: 900;
+      font-size: 16px; padding: 6px 14px; border-radius: 50%; letter-spacing: 1px;
+      border: 2px solid #fc3d21; margin-bottom: 6px;
+    }
+    .nasa-badge p { font-size: 11px; color: var(--text-muted); }
+
+    /* Main Content */
+    .main { flex: 1; padding: 18px 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      background: linear-gradient(90deg, rgba(6, 11, 25, 0.88) 0%, rgba(15, 23, 42, 0.55) 50%, rgba(124, 45, 18, 0.65) 100%),
+                  url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=80') center/cover;
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 22px 28px;
+      text-align: center;
+    }
+    .user-pill {
+      position: absolute; top: 14px; right: 18px;
+      background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass);
+      padding: 6px 12px; border-radius: 20px; font-size: 12px; color: var(--text-muted);
+    }
+    .hero h2 { font-size: 24px; font-weight: 700; line-height: 1.3; max-width: 650px; margin: 0 auto; }
+    .hero p { font-size: 13px; color: #cbd5e1; margin-top: 6px; }
+
+    /* Glass Panel */
+    .panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 15px 18px;
+    }
+    .panel-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; color: #e2e8f0; }
+
+    /* Controls Row */
+    .controls-grid { display: grid; grid-template-columns: 1.2fr 1.5fr 0.8fr; gap: 18px; align-items: center; }
+    .target-cards { display: flex; gap: 12px; }
+    .target-card {
+      flex: 1; background: rgba(30, 41, 59, 0.7); border: 2px solid transparent;
+      border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s;
+    }
+    .target-card.active { border-color: var(--accent-blue); background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 15px rgba(56, 189, 248, 0.25); }
+    .planet-icon { width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 6px; }
+    .moon-orb { background: radial-gradient(circle at 30% 30%, #e2e8f0, #64748b); box-shadow: inset -6px -6px 12px rgba(0,0,0,0.6); }
+    .mars-orb { background: radial-gradient(circle at 30% 30%, #fb923c, #9a3412); box-shadow: inset -6px -6px 12px rgba(0,0,0,0.6); }
+    .target-card span { font-size: 13px; font-weight: 600; }
+
+    .factors-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; }
+    .factor-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; cursor: pointer; }
+    .factor-item input { accent-color: var(--accent-blue); width: 15px; height: 15px; }
+
+    .run-btn {
+      width: 100%; padding: 14px 18px; border: none; border-radius: 12px;
+      background: linear-gradient(90deg, #0284c7, #38bdf8); color: white;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35);
+    }
+    .run-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5); }
+
+    /* Dual Maps + Ranking Grid */
+    .mid-grid { display: grid; grid-template-columns: 1.15fr 1.15fr 0.9fr; gap: 16px; }
+    .map-box { height: 280px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: #020617; z-index: 1; }
+    .map-legend { display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
+    .ranking-list { display: flex; flex-direction: column; gap: 10px; }
+    .rank-card {
+      display: flex; align-items: center; gap: 10px; background: rgba(30, 41, 59, 0.65);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 9px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .rank-card:hover { border-color: var(--accent-blue); background: rgba(30, 41, 59, 0.95); }
+    .rank-img { width: 56px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .rank-info { flex: 1; }
+    .rank-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+    .rank-header h4 { font-size: 12px; font-weight: 600; }
+    .badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; color: white; }
+    .rank-info p { font-size: 11px; color: var(--text-muted); line-height: 1.25; }
+
+    /* Bottom Grid */
+    .bot-grid { display: grid; grid-template-columns: 1.1fr 1.3fr 1fr; gap: 16px; }
+    .insights-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-top: 6px; }
+    .insight-box { background: rgba(30, 41, 59, 0.5); padding: 10px 6px; border-radius: 10px; }
+    .insight-box i { font-size: 18px; color: var(--accent-blue); margin-bottom: 6px; }
+    .insight-box h5 { font-size: 11px; color: #e2e8f0; margin-bottom: 3px; }
+    .insight-box strong { display: block; font-size: 12px; color: #fff; margin-bottom: 2px; }
+    .insight-box span { font-size: 10px; color: var(--text-muted); }
+
+    .about-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+    .learn-btn {
+      background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent-blue);
+      color: var(--accent-blue); padding: 7px 14px; border-radius: 8px; font-size: 12px;
+      cursor: pointer; font-weight: 600;
+    }
+
+    .custom-pin {
+      width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.9);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <h1>TerraSpace</h1>
+        <p>Earth to Moon & Mars<br>Analog Finder</p>
+      </div>
+      <nav class="nav-menu">
+        <a class="nav-item active"><i class="fa-solid fa-house"></i> Home</a>
+        <a class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Map</a>
+        <a class="nav-item"><i class="fa-solid fa-chart-column"></i> Analysis</a>
+        <a class="nav-item"><i class="fa-solid fa-database"></i> Data Sources</a>
+        <a class="nav-item"><i class="fa-solid fa-circle-info"></i> About</a>
+      </nav>
+    </div>
+
+    <div class="nasa-badge">
+      <div class="nasa-logo">NASA</div>
+      <p>Powered by<br>NASA Open Data</p>
+    </div>
+  </aside>
+
+  <!-- Main Dashboard -->
+  <main class="main">
+    
+    <!-- Hero Banner -->
+    <section class="hero">
+      <div class="user-pill"><i class="fa-solid fa-user-astronaut"></i> Welcome, Explorer ▾</div>
+      <h2>Find the Best Earth Locations<br>that Resemble the Moon or Mars</h2>
+      <p>Explore. Analyze. Discover.</p>
+    </section>
+
+    <!-- Control Bar -->
+    <section class="panel controls-grid">
+      <div>
+        <div class="panel-title"><span><i class="fa-solid fa-crosshairs" style="color: var(--accent-blue);"></i> Select Target Body</span></div>
+        <div class="target-cards">
+          <div class="target-card active" id="btn-moon" onclick="selectTarget('moon')">
+            <div class="planet-icon moon-orb"></div>
+            <span>Moon</span>
+          </div>
+          <div class="target-card" id="btn-mars" onclick="selectTarget('mars')">
+            <div class="planet-icon mars-orb"></div>
+            <span>Mars</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel-title"><span><i class="fa-solid fa-filter" style="color: var(--accent-blue);"></i> Analysis Factors</span></div>
+        <div class="factors-grid">
+          <label class="factor-item"><input type="checkbox" checked> Topography</label>
+          <label class="factor-item"><input type="checkbox" checked> Terrain</label>
+          <label class="factor-item"><input type="checkbox" checked> Geology</label>
+          <label class="factor-item"><input type="checkbox" checked> Resources</label>
+          <label class="factor-item"><input type="checkbox" checked> Temperature</label>
+          <label class="factor-item"><input type="checkbox" checked> Environment</label>
+        </div>
+      </div>
+
+      <div>
+        <button class="run-btn" onclick="runAnalysis()">
+          <i class="fa-solid fa-magnifying-glass"></i> Run Analysis →
+        </button>
+      </div>
+    </section>
+
+    <!-- Dual Maps (Planetary + Earth) & Ranking -->
+    <section class="mid-grid">
+      
+      <!-- 1. Moon / Mars Surface Map -->
+      <div class="panel">
+        <div class="panel-title">
+          <span id="planetMapTitle"><i class="fa-solid fa-moon" style="color: var(--accent-purple);"></i> Moon Surface Map</span>
+          <span id="planetSiteBadge" style="font-size: 11px; color: var(--accent-blue);">Apollo 17 & Artemis</span>
+        </div>
+        <div id="planetMap" class="map-box"></div>
+        <div class="map-legend">
+          <span><i class="dot" style="background: #38bdf8;"></i>Rover Traverse</span>
+          <span><i class="dot" style="background: #facc15;"></i>Landing / Base Site</span>
+        </div>
+      </div>
+
+      <!-- 2. Earth Analog Locations Map -->
+      <div class="panel">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-earth-americas" style="color: var(--accent-green);"></i> Earth Analog Locations</span>
+          <span style="font-size: 11px; color: var(--text-muted);">Satellite View</span>
+        </div>
+        <div id="earthMap" class="map-box"></div>
+        <div class="map-legend">
+          <span><i class="dot" style="background: var(--accent-orange);"></i>Mars Analog</span>
+          <span><i class="dot" style="background: var(--accent-purple);"></i>Moon Analog</span>
+          <span><i class="dot" style="background: var(--accent-green);"></i>High Similarity</span>
+        </div>
+      </div>
+
+      <!-- 3. Results Ranking -->
+      <div class="panel">
+        <div class="panel-title"><span><i class="fa-solid fa-trophy" style="color: #facc15;"></i> Results Ranking</span></div>
+        <div class="ranking-list" id="rankingList"></div>
+      </div>
+
+    </section>
+
+    <!-- Bottom Insights, Chart & About -->
+    <section class="bot-grid">
+      <div class="panel">
+        <div class="panel-title"><span><i class="fa-solid fa-chart-simple" style="color: var(--accent-blue);"></i> Key Insights</span></div>
+        <div class="insights-row">
+          <div class="insight-box">
+            <i class="fa-solid fa-temperature-half"></i>
+            <h5>Temperature Range</h5>
+            <strong>-70°C to 50°C</strong>
+            <span>(similar to Moon & Mars)</span>
+          </div>
+          <div class="insight-box">
+            <i class="fa-solid fa-mountain"></i>
+            <h5>Elevation Range</h5>
+            <strong>-450 m to 6,500 m</strong>
+            <span>(ideal for varied terrain)</span>
+          </div>
+          <div class="insight-box">
+            <i class="fa-solid fa-droplet"></i>
+            <h5>Water / Ice Presence</h5>
+            <strong>in Polar Regions</strong>
+            <span>(potential resources)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><span><i class="fa-solid fa-chart-line" style="color: var(--accent-blue);"></i> Comparison Overview</span></div>
+        <canvas id="comparisonChart" height="125"></canvas>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><span><i class="fa-solid fa-lightbulb" style="color: #facc15;"></i> About This Project</span></div>
+        <p class="about-text">
+          TerraSpace helps identify Earth locations that analog the permanent Moon and Mars bases, using NASA PDS data, AI analysis, and dual planetary mapping.
+        </p>
+        <button class="learn-btn" onclick="alert('Built for 2026 NASA Space Apps Challenge using PDS & OpenTopography Data!')">Learn More →</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // 1. Initialize Planetary Map (Moon / Mars)
+    const planetMap = L.map('planetMap').setView([20.19, 30.77], 3);
+    
+    const moonTileUrl = 'https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-moon-basemap-v0-1/all/{z}/{x}/{y}.png';
+    const marsTileUrl = 'https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-mars-basemap-v0-2/all/{z}/{x}/{y}.png';
+
+    let planetTileLayer = L.tileLayer(moonTileUrl, { maxZoom: 7, attribution: 'NASA / OpenPlanetary' }).addTo(planetMap);
+    let planetMarkersLayer = L.layerGroup().addTo(planetMap);
+
+    // 2. Initialize Earth Map
+    const earthMap = L.map('earthMap').setView([15, 0], 1);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri'
+    }).addTo(earthMap);
+    let earthMarkersLayer = L.layerGroup().addTo(earthMap);
+
+    let selectedPlanet = 'moon';
+
+    // Planetary Sites Data (From NASA PDS)
+    const planetarySites = {
+      moon: {
+        title: '<i class="fa-solid fa-moon" style="color: #a855f7;"></i> Moon Surface Map',
+        badge: 'Apollo 17 & South Pole',
+        center: [20.19, 30.77],
+        zoom: 4,
+        sites: [
+          { name: "Apollo 17 (Taurus-Littrow)", lat: 20.19, lng: 30.77, info: "Lunar Rover Traverse & Basalt Samples" },
+          { name: "Apollo 15 (Hadley Rille)", lat: 26.13, lng: 3.63, info: "Mountainous Highlands & Rille" },
+          { name: "Shackleton Crater (South Pole)", lat: -89.9, lng: 0.0, info: "Permanent Base Candidate (Water Ice)" }
+        ]
+      },
+      mars: {
+        title: '<i class="fa-solid fa-globe" style="color: #f97316;"></i> Mars Surface Map',
+        badge: 'Jezero Crater (Perseverance)',
+        center: [18.44, 77.45],
+        zoom: 4,
+        sites: [
+          { name: "Jezero Crater (Mars 2020)", lat: 18.44, lng: 77.45, info: "Perseverance Rover Traverse & Delta" },
+          { name: "Gale Crater (Curiosity)", lat: -5.4, lng: 137.8, info: "Mount Sharp Sedimentary Layers" },
+          { name: "Olympus Mons", lat: 18.65, lng: -133.8, info: "Volcanic Basalt Terrain" }
+        ]
+      }
+    };
+
+    // Earth Analog Sites Data
+    const earthLocations = [
+      {
+        name: "Atacama Desert, Chile", short: "Atacama Desert",
+        lat: -24.5, lng: -69.25, score: "96.4%", color: "#f97316", badgeColor: "#ef4444",
+        type: "mars", desc: "Extreme dryness & rocky terrain similar to Mars",
+        img: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=200&q=80"
+      },
+      {
+        name: "Death Valley, USA", short: "Death Valley",
+        lat: 36.5, lng: -117.0, score: "95.8%", color: "#f97316", badgeColor: "#f97316",
+        type: "mars", desc: "Arid landscape with Mars-like geology",
+        img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=200&q=80"
+      },
+      {
+        name: "McMurdo Dry Valleys, Antarctica", short: "McMurdo Dry Valleys",
+        lat: -77.5, lng: 162.0, score: "94.7%", color: "#a855f7", badgeColor: "#a855f7",
+        type: "moon", desc: "Cold, dry environment like the Moon",
+        img: "https://images.unsplash.com/photo-1517783999520-f068d7431a60?auto=format&fit=crop&w=200&q=80"
+      },
+      {
+        name: "Haughton Crater, Canada", short: "Haughton Crater",
+        lat: 75.4, lng: -89.7, score: "93.1%", color: "#22c55e", badgeColor: "#22c55e",
+        type: "moon", desc: "Impact crater structure ideal for lunar base testing",
+        img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=200&q=80"
+      },
+      {
+        name: "Iceland Volcanic Highlands", short: "Iceland",
+        lat: 64.9, lng: -18.0, score: "92.9%", color: "#38bdf8", badgeColor: "#0284c7",
+        type: "moon", desc: "Basaltic lava fields resembling lunar maria",
+        img: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=200&q=80"
+      }
+    ];
+
+    function selectTarget(planet) {
+      selectedPlanet = planet;
+      document.getElementById('btn-moon').classList.toggle('active', planet === 'moon');
+      document.getElementById('btn-mars').classList.toggle('active', planet === 'mars');
+    }
+
+    function runAnalysis() {
+      // A. Update Planetary Map (Moon or Mars)
+      const pData = planetarySites[selectedPlanet];
+      document.getElementById('planetMapTitle').innerHTML = pData.title;
+      document.getElementById('planetSiteBadge').innerText = pData.badge;
+
+      planetTileLayer.setUrl(selectedPlanet === 'moon' ? moonTileUrl : marsTileUrl);
+      planetMarkersLayer.clearLayers();
+      planetMap.setView(pData.center, pData.zoom);
+
+      const traverseCoords = [];
+      pData.sites.forEach(s => {
+        traverseCoords.push([s.lat, s.lng]);
+        const pIcon = L.divIcon({
+          className: '',
+          html: `<div class="custom-pin" style="background:#facc15;"></div>`,
+          iconSize: [16, 16], iconAnchor: [8, 8]
+        });
+        L.marker([s.lat, s.lng], { icon: pIcon })
+          .addTo(planetMarkersLayer)
+          .bindTooltip(`<b>${s.name}</b>`, { permanent: true, direction: 'top', offset: [0, -8] })
+          .bindPopup(`<b>${s.name}</b><br>${s.info}`);
+      });
+
+      L.polyline(traverseCoords, { color: '#38bdf8', weight: 3, dashArray: '6, 6' }).addTo(planetMarkersLayer);
+
+      // B. Update Earth Analog Map & Ranking
+      earthMarkersLayer.clearLayers();
+      const rankingContainer = document.getElementById('rankingList');
+      rankingContainer.innerHTML = '';
+
+      const sorted = [...earthLocations].sort((a, b) => (a.type === selectedPlanet ? -1 : 1));
+
+      sorted.forEach((loc, index) => {
+        const icon = L.divIcon({
+          className: '',
+          html: `<div class="custom-pin" style="background:${loc.color};"></div>`,
+          iconSize: [16, 16], iconAnchor: [8, 8]
+        });
+
+        L.marker([loc.lat, loc.lng], { icon })
+          .addTo(earthMarkersLayer)
+          .bindTooltip(`<b>${loc.short}</b> (${loc.score})`, { permanent: true, direction: 'right', offset: [8, 0] });
+
+        if (index < 3) {
+          const card = document.createElement('div');
+          card.className = 'rank-card';
+          card.onclick = () => earthMap.flyTo([loc.lat, loc.lng], 6);
+          card.innerHTML = `
+            <img src="${loc.img}" class="rank-img" alt="${loc.name}">
+            <div class="rank-info">
+              <div class="rank-header">
+                <h4>${index + 1}. ${loc.name}</h4>
+                <span class="badge" style="background:${loc.badgeColor}">${loc.score}</span>
+              </div>
+              <p>${loc.desc}</p>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 11px;"></i>
+          `;
+          rankingContainer.appendChild(card);
+        }
+      });
+
+      earthMap.flyTo([15, 0], 1);
+    }
+
+    // 3. Comparison Bar Chart
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Terrain', 'Geology', 'Temperature', 'Resources'],
+        datasets: [
+          { label: 'Earth', data: [88, 92, 85, 90], backgroundColor: '#3b82f6', borderRadius: 4 },
+          { label: 'Moon', data: [78, 84, 65, 72], backgroundColor: '#a855f7', borderRadius: 4 },
+          { label: 'Mars', data: [85, 90, 76, 80], backgroundColor: '#f97316', borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.06)' }, max: 100 }
+        }
+      }
+    });
+
+    runAnalysis();
+  </script>
+</body>
+</html>
