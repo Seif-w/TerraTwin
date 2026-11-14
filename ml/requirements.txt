@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+pandas
+numpy
+
+# Optional - only needed on the Windows training machine (TerraTwinNet)
+# torch
+# torchvision
+# rasterio
+# mysql-connector-python
+scikit-learn>=1.4
+scipy
+joblib
+
+Pillow
+requests
+shapely>=2.0

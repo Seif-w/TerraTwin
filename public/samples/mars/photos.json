@@ -1,0 +1,83 @@
+[
+ {
+  "site": "skinner_ridge",
+  "file": "skinner_ridge.jpg",
+  "volume": 2,
+  "page": 21,
+  "figure": "Vol. 2 Fig. 3 (p. 21): layered Rockytop ridge, Hawksbill Gap",
+  "width": 1280,
+  "height": 468
+ },
+ {
+  "site": "wildcat_ridge",
+  "file": "wildcat_ridge.jpg",
+  "volume": 2,
+  "page": 68,
+  "figure": "Vol. 2 Fig. 5 (p. 68): Mastcam-Z workspace image of Wildcat Ridge",
+  "width": 1280,
+  "height": 1148
+ },
+ {
+  "site": "amalik",
+  "file": "amalik.jpg",
+  "volume": 2,
+  "page": 106,
+  "figure": "Vol. 2 Fig. 3 (p. 106): Enchanted Lake at the base of the Alagnak ridge",
+  "width": 1280,
+  "height": 632
+ },
+ {
+  "site": "hidden_harbor",
+  "file": "hidden_harbor.jpg",
+  "volume": 2,
+  "page": 158,
+  "figure": "Vol. 2 Fig. 3 (p. 158): Hidden Harbor and Yori Pass below Whale Mountain",
+  "width": 1280,
+  "height": 660
+ },
+ {
+  "site": "observation_mountain",
+  "file": "observation_mountain.jpg",
+  "volume": 2,
+  "page": 204,
+  "figure": "Vol. 2 Fig. 11A (p. 204): wheel-scuffed Observation Mountain megaripple",
+  "width": 518,
+  "height": 337
+ },
+ {
+  "site": "hans_amundsen",
+  "file": "hans_amundsen.jpg",
+  "volume": 4,
+  "page": 23,
+  "figure": "Vol. 4 Fig. 7 (p. 23): Mastcam-Z mosaic of the Hans Amundsen Memorial Workspace",
+  "width": 1280,
+  "height": 960
+ },
+ {
+  "site": "turquoise_bay",
+  "file": "turquoise_bay.jpg",
+  "volume": 4,
+  "page": 56,
+  "figure": "Vol. 4 (p. 56): Mastcam-Z context image of the Turquoise Bay workspace",
+  "width": 978,
+  "height": 335
+ },
+ {
+  "site": "bunsen_peak",
+  "file": "bunsen_peak.jpg",
+  "volume": 4,
+  "page": 96,
+  "figure": "Vol. 4 Fig. 7 (p. 96): Mastcam-Z mosaic of Bunsen Peak",
+  "width": 1280,
+  "height": 531
+ },
+ {
+  "site": "beaver_falls",
+  "file": "beaver_falls.jpg",
+  "volume": 4,
+  "page": 132,
+  "figure": "Vol. 4 Fig. 10 (p. 132): Mastcam-Z mosaic of the Beaver Falls workspace",
+  "width": 1004,
+  "height": 453
+ }
+]

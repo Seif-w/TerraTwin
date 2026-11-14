@@ -1,0 +1,3 @@
+image_id,source_body,sensor,is_raw_jpeg,radiometric_albedo_mean,incidence_deg,emission_deg,phase_deg,sun_elev_deg,gsd_m_per_px,target_tile_id,target_archetype,pair_label,split_block,split_region,annotator_confidence
+M2020_004217_L0,Mars,Mastcam-Z L,true,,38.2,12.4,26.7,14.9,0.34,"EARTH_WD_137,568",A3_deltaic_plain,1,block_25_28,Western_Desert_Egypt,0.8
+NAC_001882_R0,Moon,LROC NAC,true,,61.0,8.1,52.9,-3.2,0.5,"EARTH_WD_68,553",A4_hardpan_flat,0,block_25_25,Western_Desert_Egypt,0.65

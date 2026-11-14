@@ -1,0 +1,37 @@
+{
+  "n_training_rows": 7180,
+  "sklearn_version": "1.9.1",
+  "training_data_sha256": "76c054d977e20f2346921161c7ac84d55c892b06343b215be39a56dd80f1555b",
+  "archetype_features": [
+    "slope_deg_mean",
+    "slope_cv",
+    "roughness_m_mean",
+    "roughness_cv",
+    "slope_log_ratio",
+    "albedo_mean",
+    "temp_range_K_mean"
+  ],
+  "quality_features": [
+    "slope_deg_mean",
+    "slope_deg_stdDev",
+    "slope_cv",
+    "roughness_m_mean",
+    "roughness_m_stdDev",
+    "roughness_cv",
+    "slope_log_ratio",
+    "roughness_rel",
+    "albedo_mean",
+    "temp_range_K_mean",
+    "aridity_index_mean",
+    "approx_lat"
+  ],
+  "archetype_names": [
+    "A1_escarpment",
+    "A2_coarse_fan",
+    "A3_deltaic_plain",
+    "A4_hardpan_flat"
+  ],
+  "scope": "Earth terrain classifiers and rule-based site-quality surrogate. Not an image encoder or photo geolocation model.",
+  "labels": "Archetypes are thresholds of measured terrain; site_quality is the suitability_frame engineering formula.",
+  "validation": "ml/data/ml_products.json contains previous spatial-block cross-validation against these rule-derived targets. It does not measure real-world base suitability or image geolocation accuracy."
+}

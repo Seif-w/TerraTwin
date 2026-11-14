@@ -1,0 +1,45 @@
+{
+ "samples": [
+  {
+   "file": "/samples/mars_jezero_delta.jpg",
+   "body": "Mars",
+   "credit": "NASA Science - Detailed Panorama of Mars' Jezero Crater Delta (Mastcam-Z, Perseverance)",
+   "geometry_note": "surface oblique, ~1 m/px at rock scale, strong atmospheric scattering",
+   "width": 1280,
+   "height": 359,
+   "bytes": 106953,
+   "license": "NASA imagery is public domain unless noted otherwise on the source page"
+  },
+  {
+   "file": "/samples/moon_apollo17_littrow.jpg",
+   "body": "Moon",
+   "credit": "NASA Science - Apollo 17 Astronaut's Snapshot of Taurus-Littrow Valley",
+   "geometry_note": "surface oblique, black sky, no atmosphere, harsh terminator shadows",
+   "width": 1400,
+   "height": 696,
+   "bytes": 166105,
+   "license": "NASA imagery is public domain unless noted otherwise on the source page"
+  },
+  {
+   "file": "/samples/moon_lroc_highlands.png",
+   "body": "Moon",
+   "credit": "NASA/GSFC/Arizona State University - LROC WAC young highlands crater",
+   "geometry_note": "orbital nadir, ~100 m/px - closest published analogue to the tile geometry",
+   "width": 1100,
+   "height": 1100,
+   "bytes": 1102444,
+   "license": "NASA imagery is public domain unless noted otherwise on the source page"
+  },
+  {
+   "file": "/samples/earth_iss_egypt.jpg",
+   "body": "Earth",
+   "credit": "NASA JSC - ISS060-E-37265 astronaut photograph of Egypt",
+   "geometry_note": "orbital oblique with blue atmosphere - shows why sky fraction must be masked",
+   "width": 720,
+   "height": 480,
+   "bytes": 118556,
+   "license": "NASA imagery is public domain unless noted otherwise on the source page"
+  }
+ ],
+ "disclaimer": "These photographs are published NASA imagery used only to demonstrate the browser feature extractor. They are not part of the 9,680-tile dataset and have no verified pixel geometry, so the matcher treats them as uncalibrated inputs and reports that explicitly."
+}

@@ -1,0 +1,9 @@
+{
+  "routes": [
+    { "path": "/", "title": "Home" },
+    { "path": "/photo", "title": "Find a place" },
+    { "path": "/mars-samples", "title": "Mars samples" },
+    { "path": "/data-layers", "title": "Explore" },
+    { "path": "/how-it-works", "title": "How it works" }
+  ]
+}

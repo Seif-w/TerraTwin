@@ -1,0 +1,35 @@
+node_modules/
+dist/
+.vite/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.pyc
+
+# Preserve original backend/geospatial protections
+.venv/
+venv/
+tf_env/
+Thumbs.db
+.vscode/
+*.tif
+*.tiff
+*.ckpt
+*.pt
+*.pth
+*.h5
+/data/*.csv
+!/data/sample_schema.csv
+*.pdf
+
+# Regenerable image sets (kept out of GitHub to keep the repo small)
+# Rebuild worldwide pictures: python scripts/build_world_index.py
+public/world/images/
+# Rebuild Mars sample photos from the Initial Reports PDFs: python scripts/extract_sample_photos.py
+public/samples/*.jpg
+public/samples/*.png
+public/samples/*.webp

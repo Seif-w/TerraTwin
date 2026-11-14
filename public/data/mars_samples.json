@@ -1,0 +1,423 @@
+{
+ "source": "Mars 2020 Initial Reports, Vol. 2 (Delta Front Campaign) and Vol. 4 (Margin Campaign)",
+ "photo_credit": "NASA/JPL-Caltech/ASU/MSSS, figures from the Mars 2020 Initial Reports",
+ "coordinates": "planetocentric latitude N, longitude E; elevation in metres relative to the Mars aeroid",
+ "n_sites": 9,
+ "n_samples": 13,
+ "elev_min_m": -2526.3,
+ "elev_max_m": -2354.2,
+ "sites": [
+  {
+   "key": "skinner_ridge",
+   "title": "Skinner Ridge",
+   "rock": "Sandstone",
+   "story": "A layered sandstone ledge at the foot of the delta. A river carried these sand grains into Jezero's old lake.",
+   "clue": "The grains are glued by iron-magnesium carbonate, a mineral that forms in water.",
+   "campaign": "Delta Front",
+   "region": "Hawksbill Gap",
+   "lat": 18.458931,
+   "lon": 77.40617078,
+   "elev_m": -2520.2,
+   "sol": 490,
+   "date": "6-July-2022",
+   "photo": "/samples/mars/skinner_ridge.jpg",
+   "photo_crop": "/samples/mars/skinner_ridge_crop.jpg",
+   "photo_size": [
+    1280,
+    468
+   ],
+   "crop_size": [
+    290,
+    249
+   ],
+   "figure": "Vol. 2 Fig. 3 (p. 21): layered Rockytop ridge, Hawksbill Gap",
+   "samples": [
+    {
+     "name": "Swift Run",
+     "designation": "M2020-490-11 Swift Run",
+     "sol": 490,
+     "date": "6-July-2022",
+     "lat": 18.458931,
+     "lon": 77.40617078,
+     "elev_m": -2520.2,
+     "volume_cm3": 9.4,
+     "campaign": "Delta Front",
+     "region": "Hawksbill Gap",
+     "report_volume": 2
+    },
+    {
+     "name": "Skyland",
+     "designation": "M2020-495-12 Skyland",
+     "sol": 495,
+     "date": "11-July-2022",
+     "lat": 18.458931,
+     "lon": 77.40617078,
+     "elev_m": -2520.2,
+     "volume_cm3": 8.3,
+     "campaign": "Delta Front",
+     "region": "Hawksbill Gap",
+     "report_volume": 2
+    }
+   ]
+  },
+  {
+   "key": "wildcat_ridge",
+   "title": "Wildcat Ridge",
+   "rock": "Mudstone with sulfate salts",
+   "story": "Fine mud that settled on the bottom of the lake, packed with sulfate salts.",
+   "clue": "Signals in this rock may come from organic molecules.",
+   "campaign": "Delta Front",
+   "region": "Hawksbill Gap",
+   "lat": 18.45863707,
+   "lon": 77.40588851,
+   "elev_m": -2523.1,
+   "sol": 509,
+   "date": "25-July-2022",
+   "photo": "/samples/mars/wildcat_ridge.jpg",
+   "photo_crop": "/samples/mars/wildcat_ridge_crop.jpg",
+   "photo_size": [
+    1280,
+    1148
+   ],
+   "crop_size": [
+    310,
+    430
+   ],
+   "figure": "Vol. 2 Fig. 5 (p. 68): Mastcam-Z workspace image of Wildcat Ridge",
+   "samples": [
+    {
+     "name": "Hazeltop",
+     "designation": "M2020-509-14 Hazeltop",
+     "sol": 509,
+     "date": "25-July-2022",
+     "lat": 18.45863707,
+     "lon": 77.40588851,
+     "elev_m": -2523.1,
+     "volume_cm3": 8.4,
+     "campaign": "Delta Front",
+     "region": "Hawksbill Gap",
+     "report_volume": 2
+    },
+    {
+     "name": "Bearwallow",
+     "designation": "M2020-516-15 Bearwallow",
+     "sol": 516,
+     "date": "2-August-2022",
+     "lat": 18.45863832,
+     "lon": 77.40588685,
+     "elev_m": -2523.1,
+     "volume_cm3": 8.8,
+     "campaign": "Delta Front",
+     "region": "Hawksbill Gap",
+     "report_volume": 2
+    }
+   ]
+  },
+  {
+   "key": "amalik",
+   "title": "Amalik",
+   "rock": "Olivine mudstone",
+   "story": "Lake-bottom mud made mostly of olivine grains and the minerals water turned them into, such as serpentine.",
+   "clue": "Serpentine only forms when water reacts with olivine.",
+   "campaign": "Delta Front",
+   "region": "Cape Nukshak",
+   "lat": 18.45068954,
+   "lon": 77.40143171,
+   "elev_m": -2526.3,
+   "sol": 575,
+   "date": "2-Oct-2022",
+   "photo": "/samples/mars/amalik.jpg",
+   "photo_crop": "/samples/mars/amalik_crop.jpg",
+   "photo_size": [
+    1280,
+    632
+   ],
+   "crop_size": [
+    655,
+    411
+   ],
+   "figure": "Vol. 2 Fig. 3 (p. 106): Enchanted Lake at the base of the Alagnak ridge",
+   "samples": [
+    {
+     "name": "Shuyak",
+     "designation": "M2020-575-16 Shuyak",
+     "sol": 575,
+     "date": "2-Oct-2022",
+     "lat": 18.45068954,
+     "lon": 77.40143171,
+     "elev_m": -2526.3,
+     "volume_cm3": 7.8,
+     "campaign": "Delta Front",
+     "region": "Cape Nukshak",
+     "report_volume": 2
+    },
+    {
+     "name": "Mageik",
+     "designation": "M2020-579-17 Mageik",
+     "sol": 579,
+     "date": "6-Oct-2022",
+     "lat": 18.45068664,
+     "lon": 77.40143554,
+     "elev_m": -2526.3,
+     "volume_cm3": 10.4,
+     "campaign": "Delta Front",
+     "region": "Cape Nukshak",
+     "report_volume": 2
+    }
+   ]
+  },
+  {
+   "key": "hidden_harbor",
+   "title": "Hidden Harbor",
+   "rock": "Fine sandstone with sulfate salts",
+   "story": "Fine sandstone higher up the delta, rich in sulfate salts and cut by white calcium-sulfate veins.",
+   "clue": "Veins mean water flowed through cracks after the rock formed.",
+   "campaign": "Delta Front",
+   "region": "Cape Nukshak",
+   "lat": 18.45363597,
+   "lon": 77.39911421,
+   "elev_m": -2517.1,
+   "sol": 623,
+   "date": "20-Nov-2022",
+   "photo": "/samples/mars/hidden_harbor.jpg",
+   "photo_crop": "/samples/mars/hidden_harbor_crop.jpg",
+   "photo_size": [
+    1280,
+    660
+   ],
+   "crop_size": [
+    910,
+    445
+   ],
+   "figure": "Vol. 2 Fig. 3 (p. 158): Hidden Harbor and Yori Pass below Whale Mountain",
+   "samples": [
+    {
+     "name": "Kukaklek",
+     "designation": "M2020-623-19 Kukaklek",
+     "sol": 623,
+     "date": "20-Nov-2022",
+     "lat": 18.45363597,
+     "lon": 77.39911421,
+     "elev_m": -2517.1,
+     "volume_cm3": 7.0,
+     "campaign": "Delta Front",
+     "region": "Cape Nukshak",
+     "report_volume": 2
+    }
+   ]
+  },
+  {
+   "key": "observation_mountain",
+   "title": "Observation Mountain",
+   "rock": "Loose soil (regolith)",
+   "story": "Loose soil from a big wind-built ripple: grains up to 5 mm, sand, silt and dust. The rover scuffed it with a wheel first.",
+   "clue": "Soil samples help plan how astronauts and machines will handle Martian dust.",
+   "campaign": "Delta Front",
+   "region": "Observation Mountain",
+   "lat": 18.45131442,
+   "lon": 77.40121811,
+   "elev_m": -2525.1,
+   "sol": 634,
+   "date": "02-Dec-2022",
+   "photo": "/samples/mars/observation_mountain.jpg",
+   "photo_crop": "/samples/mars/observation_mountain_crop.jpg",
+   "photo_size": [
+    518,
+    337
+   ],
+   "crop_size": [
+    509,
+    328
+   ],
+   "figure": "Vol. 2 Fig. 11A (p. 204): wheel-scuffed Observation Mountain megaripple",
+   "samples": [
+    {
+     "name": "Atmo Mountain",
+     "designation": "M2020-634-20 Atmo Mountain",
+     "sol": 634,
+     "date": "02-Dec-2022",
+     "lat": 18.45131442,
+     "lon": 77.40121811,
+     "elev_m": -2525.1,
+     "volume_cm3": 7.47,
+     "campaign": "Delta Front",
+     "region": "Observation Mountain",
+     "report_volume": 2
+    },
+    {
+     "name": "Crosswind Lake",
+     "designation": "M2020-639-21 Crosswind Lake",
+     "sol": 639,
+     "date": "06-Dec-2022",
+     "lat": 18.45132238,
+     "lon": 77.40121614,
+     "elev_m": -2525.0,
+     "volume_cm3": 7.47,
+     "campaign": "Delta Front",
+     "region": "Observation Mountain",
+     "report_volume": 2
+    }
+   ]
+  },
+  {
+   "key": "hans_amundsen",
+   "title": "Hans Amundsen Workspace",
+   "rock": "Sandstone with carbonate and silica",
+   "story": "First rock from the Margin unit near the crater rim: coarse grains glued by silica, with carbonate coatings.",
+   "clue": "The first hydrated carbonates ever found in Jezero.",
+   "campaign": "Margin",
+   "region": "Mandu Wall",
+   "lat": 18.48344692,
+   "lon": 77.35065098,
+   "elev_m": -2423.1,
+   "sol": 923,
+   "date": "23-September-2023",
+   "photo": "/samples/mars/hans_amundsen.jpg",
+   "photo_crop": "/samples/mars/hans_amundsen_crop.jpg",
+   "photo_size": [
+    1280,
+    960
+   ],
+   "crop_size": [
+    1260,
+    940
+   ],
+   "figure": "Vol. 4 Fig. 7 (p. 23): Mastcam-Z mosaic of the Hans Amundsen Memorial Workspace",
+   "samples": [
+    {
+     "name": "Pelican Point",
+     "designation": "M2020-923-25 Pelican Point",
+     "sol": 923,
+     "date": "23-September-2023",
+     "lat": 18.48344692,
+     "lon": 77.35065098,
+     "elev_m": -2423.1,
+     "volume_cm3": 8.6,
+     "campaign": "Margin",
+     "region": "Mandu Wall",
+     "report_volume": 4
+    }
+   ]
+  },
+  {
+   "key": "turquoise_bay",
+   "title": "Turquoise Bay",
+   "rock": "Sandstone with carbonate",
+   "story": "A high spot of the same Margin unit, chosen because orbiters saw a strong carbonate signal here.",
+   "clue": "Carbonate and silica cements are good places to look for traces of past life.",
+   "campaign": "Margin",
+   "region": "Turquoise Bay",
+   "lat": 18.48867278,
+   "lon": 77.34704595,
+   "elev_m": -2407.6,
+   "sol": 949,
+   "date": "13-October-2023",
+   "photo": "/samples/mars/turquoise_bay.jpg",
+   "photo_crop": "/samples/mars/turquoise_bay_crop.jpg",
+   "photo_size": [
+    978,
+    335
+   ],
+   "crop_size": [
+    493,
+    320
+   ],
+   "figure": "Vol. 4 (p. 56): Mastcam-Z context image of the Turquoise Bay workspace",
+   "samples": [
+    {
+     "name": "Lefroy Bay",
+     "designation": "M2020-949-26 Lefroy Bay",
+     "sol": 949,
+     "date": "13-October-2023",
+     "lat": 18.48867278,
+     "lon": 77.34704595,
+     "elev_m": -2407.6,
+     "volume_cm3": 6.6,
+     "campaign": "Margin",
+     "region": "Turquoise Bay",
+     "report_volume": 4
+    }
+   ]
+  },
+  {
+   "key": "bunsen_peak",
+   "title": "Bunsen Peak",
+   "rock": "Carbonate-rich rock",
+   "story": "A dark, tough slab standing above a flat landscape. It is mostly carbonate and silica.",
+   "clue": "Either a coarse sandstone or a volcanic rock completely changed by water.",
+   "campaign": "Margin",
+   "region": "Western Margin",
+   "lat": 18.49186664,
+   "lon": 77.3272192,
+   "elev_m": -2382.4,
+   "sol": 1088,
+   "date": "11-March-2024",
+   "photo": "/samples/mars/bunsen_peak.jpg",
+   "photo_crop": "/samples/mars/bunsen_peak_crop.jpg",
+   "photo_size": [
+    1280,
+    531
+   ],
+   "crop_size": [
+    540,
+    340
+   ],
+   "figure": "Vol. 4 Fig. 7 (p. 96): Mastcam-Z mosaic of Bunsen Peak",
+   "samples": [
+    {
+     "name": "Comet Geyser",
+     "designation": "M2020-1088-27 Comet Geyser",
+     "sol": 1088,
+     "date": "11-March-2024",
+     "lat": 18.49186664,
+     "lon": 77.3272192,
+     "elev_m": -2382.4,
+     "volume_cm3": 8.15,
+     "campaign": "Margin",
+     "region": "Western Margin",
+     "report_volume": 4
+    }
+   ]
+  },
+  {
+   "key": "beaver_falls",
+   "title": "Beaver Falls",
+   "rock": "Veined mudstone",
+   "story": "A light-toned, veined rock in Neretva Vallis, the old river channel that fed the crater.",
+   "clue": "It holds small 'reduction spots' and organic signals that the team lists as potential biosignatures.",
+   "campaign": "Margin",
+   "region": "Bright Angel",
+   "lat": 18.49747434,
+   "lon": 77.30514915,
+   "elev_m": -2354.2,
+   "sol": 1215,
+   "date": "21-July-2024",
+   "photo": "/samples/mars/beaver_falls.jpg",
+   "photo_crop": "/samples/mars/beaver_falls_crop.jpg",
+   "photo_size": [
+    1004,
+    453
+   ],
+   "crop_size": [
+    455,
+    375
+   ],
+   "figure": "Vol. 4 Fig. 10 (p. 132): Mastcam-Z mosaic of the Beaver Falls workspace",
+   "samples": [
+    {
+     "name": "Sapphire Canyon",
+     "designation": "M2020-1215-28 Sapphire Canyon",
+     "sol": 1215,
+     "date": "21-July-2024",
+     "lat": 18.49747434,
+     "lon": 77.30514915,
+     "elev_m": -2354.2,
+     "volume_cm3": 8.8,
+     "campaign": "Margin",
+     "region": "Bright Angel",
+     "report_volume": 4
+    }
+   ]
+  }
+ ]
+}

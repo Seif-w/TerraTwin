@@ -1,0 +1,12 @@
+{
+  "source": "OpenStreetMap Nominatim search, coordinates looked up 2026-11-14 (data (c) OpenStreetMap contributors, ODbL)",
+  "places": [
+    { "name": "Mut", "area": "Dakhla Oasis", "lat": 25.4895, "lon": 28.9866, "kind": "town" },
+    { "name": "Balat", "area": "Dakhla Oasis", "lat": 25.5592, "lon": 29.2651, "kind": "town" },
+    { "name": "Farafra", "area": "Farafra Oasis", "lat": 27.0642, "lon": 27.9684, "kind": "oasis" },
+    { "name": "Abu Minqar", "area": "Farafra-Dakhla road", "lat": 26.5062, "lon": 27.6620, "kind": "town" },
+    { "name": "Ain Dalla", "area": "Great Sand Sea edge", "lat": 27.3190, "lon": 27.3354, "kind": "village" },
+    { "name": "Abu Ballas hill", "area": "Western Desert", "lat": 24.4390, "lon": 27.6488, "kind": "landmark" },
+    { "name": "Gilf Kebir plateau", "area": "Western Desert", "lat": 23.7380, "lon": 25.3532, "kind": "landmark" }
+  ]
+}

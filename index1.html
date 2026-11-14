@@ -397,6 +397,8 @@
           <div class="ranking-list" id="rankingList">
             <!-- Populated dynamically by JS -->
           </div>
+          <div id="mlProvenance" style="margin-top:14px; font-size:11.5px; color:var(--text-muted);
+               border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; line-height:1.65;"></div>
         </div>
 
         <!-- Similarity Comparison Chart -->
@@ -662,6 +664,10 @@
     let selectedPlanet = 'moon';
     let comparisonChart = null;
 
+    // API base: same origin when served over http (uvicorn /app), else local dev server.
+    const API_BASE = window.TERRATWIN_API ||
+      (location.protocol.startsWith('http') ? '' : 'http://127.0.0.1:8000');
+
     function selectTarget(planet) {
       selectedPlanet = planet;
       document.getElementById('btn-moon').classList.toggle('active', planet === 'moon');
@@ -684,7 +690,7 @@
       btn.disabled = true;
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/analyze', {
+        const response = await fetch(`${API_BASE}/api/analyze`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -767,14 +773,52 @@
 
         // C. Update Comparison Chart
         updateChart(data.comparison_metrics);
+        renderMeasuredSites(data.target_body);
         resizeGlobes();
 
       } catch (err) {
         console.error(err);
-        alert('تأكد إن سيرفر الباك إند شغال على http://127.0.0.1:8000');
+        alert('Backend unreachable at ' + (API_BASE || location.origin) +
+              ' - start it with: uvicorn main:app --port 8000, then open /app');
       } finally {
         btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Run Analysis &rarr;';
         btn.disabled = false;
+      }
+    }
+
+    // Render tiles ranked by the trained model (04_ml_rank.py products) when available.
+    async function renderMeasuredSites(targetBody) {
+      const box = document.getElementById('mlProvenance');
+      box.innerHTML = 'Loading measured model output...';
+      try {
+        const [sq, tr] = await Promise.all([
+          fetch(`${API_BASE}/api/model/site-quality?limit=12`).then(r => r.ok ? r.json() : null),
+          fetch(`${API_BASE}/api/model/transferability`).then(r => r.ok ? r.json() : null)
+        ]);
+        if (!sq) {
+          box.innerHTML = '<b>Demo mode.</b> The trained dataset is not loaded on this backend ' +
+            '(run 03_harmonize.py + 04_ml_rank.py). Scores above are the hardcoded fallback list.';
+          return;
+        }
+        const list = (sq.top || []).slice(0, 6).map(t =>
+          `<li>${t.tile_id.replace('EARTH_WD_', 'WD ')} @ ${t.approx_lat.toFixed(2)}N, ` +
+          `${t.approx_lon.toFixed(2)}E &mdash; quality <b>${t.site_quality}</b> (${t.archetype})</li>`).join('');
+        const cv = sq.model || {};
+        let conf = '';
+        if (tr && tr.records) {
+          const rec = tr.records.find(r => r.target.toLowerCase() === targetBody) || tr.records[0];
+          conf = `<br><b>Confidence:</b> after full cross-scale calibration a classifier still tells ` +
+            `${rec.target} tiles from Earth tiles at AUC <b>${rec.auc_quantile_mapped}</b> ` +
+            `(raw ${rec.auc_raw}). ${rec.target === 'Moon'
+              ? 'So lunar similarity is reported as an archetype mix, not one percentage.'
+              : 'Mars similarity is mostly calibration; residual is real geomorphic difference.'}`;
+        }
+        box.innerHTML = `<b>Measured, not hardcoded:</b> top Western Desert camp sites from ` +
+          `7,180 tiles &mdash; spatial-block CV R&sup2; ${cv.cv_r2 ?? 'n/a'}, ` +
+          `archetype CV accuracy ${sq.archetype_model?.block_cv_accuracy ?? 'n/a'} ` +
+          `vs 0.50 majority baseline.<ul style="margin:6px 0 0 18px;">${list}</ul>${conf}`;
+      } catch (e) {
+        box.innerHTML = 'Model endpoints unreachable: ' + e.message;
       }
     }
 

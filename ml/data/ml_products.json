@@ -1,0 +1,603 @@
+{
+  "dem_grid_m": {
+    "Earth": 30.0,
+    "Mars": 200.0,
+    "Moon": 118.0
+  },
+  "features": [
+    "slope_deg_mean",
+    "slope_deg_stdDev",
+    "slope_cv",
+    "roughness_m_mean",
+    "roughness_m_stdDev",
+    "roughness_cv",
+    "slope_log_ratio",
+    "roughness_rel"
+  ],
+  "archetype_features": [
+    "slope_deg_mean",
+    "slope_cv",
+    "roughness_m_mean",
+    "roughness_cv",
+    "slope_log_ratio",
+    "albedo_mean",
+    "temp_range_K_mean"
+  ],
+  "archetype_names": [
+    "A1_escarpment",
+    "A2_coarse_fan",
+    "A3_deltaic_plain",
+    "A4_hardpan_flat"
+  ],
+  "lrv_slope_limit_deg": 19.0,
+  "transfer_diagnostics": [
+    {
+      "target": "Mars",
+      "auc_raw": 1.0,
+      "auc_shift_scale_aligned": 0.981,
+      "auc_quantile_mapped": 0.911,
+      "median_ratio_slope": 2.08,
+      "median_ratio_roughness": 1.82,
+      "median_ratio_slope_cv": 0.83,
+      "median_ratio_roughness_cv": 1.07
+    },
+    {
+      "target": "Moon",
+      "auc_raw": 0.999,
+      "auc_shift_scale_aligned": 1.0,
+      "auc_quantile_mapped": 0.999,
+      "median_ratio_slope": 8.69,
+      "median_ratio_roughness": 8.02,
+      "median_ratio_slope_cv": 0.63,
+      "median_ratio_roughness_cv": 0.86
+    }
+  ],
+  "archetype_model": {
+    "n_tiles": 7180,
+    "cv_mode": "spatial_block",
+    "block_deg": 0.8102,
+    "spatial_blocks": 36,
+    "block_cv_accuracy": 0.9958,
+    "block_cv_macro_f1": 0.9909,
+    "baseline_shuffled_label_accuracy": 0.4426,
+    "baseline_majority_class_rate": 0.5033,
+    "class_counts": {
+      "A1_escarpment": 751,
+      "A2_coarse_fan": 359,
+      "A3_deltaic_plain": 3614,
+      "A4_hardpan_flat": 2456
+    }
+  },
+  "site_quality_model": {
+    "n_tiles": 7180,
+    "features": [
+      "slope_deg_mean",
+      "slope_deg_stdDev",
+      "slope_cv",
+      "roughness_m_mean",
+      "roughness_m_stdDev",
+      "roughness_cv",
+      "slope_log_ratio",
+      "roughness_rel",
+      "albedo_mean",
+      "temp_range_K_mean",
+      "aridity_index_mean",
+      "approx_lat"
+    ],
+    "cv_mode": "spatial_block",
+    "block_deg": 0.8102,
+    "spatial_blocks": 36,
+    "cv_r2": 0.9959,
+    "cv_spearman": 0.9975,
+    "cv_mae": 0.0052,
+    "permutation_importance": {
+      "slope_cv": 0.7219,
+      "roughness_m_stdDev": 0.32985,
+      "albedo_mean": 0.12033,
+      "roughness_m_mean": 0.06318,
+      "slope_deg_stdDev": 0.06193,
+      "temp_range_K_mean": 0.01454,
+      "roughness_cv": 0.01207,
+      "slope_deg_mean": 0.00355,
+      "approx_lat": 0.00038,
+      "aridity_index_mean": 0.0003,
+      "slope_log_ratio": 0.0,
+      "roughness_rel": 0.0
+    }
+  },
+  "targets": {
+    "jezero_upper_fan": {
+      "target_body": "Mars",
+      "rationale": "M2020 IR Vol.3 unit D-tcl delta front/upper fan: Melyn 749-22, Otis Peak 822-23, Pilot Mountain 882-24.",
+      "tiles_used": 773,
+      "archetype_mix": {
+        "A1_escarpment": 0.0893,
+        "A2_coarse_fan": 0.0481,
+        "A3_deltaic_plain": 0.5133,
+        "A4_hardpan_flat": 0.3493
+      },
+      "archetype_mix_native_uncalibrated": {
+        "A1_escarpment": 0.0996,
+        "A2_coarse_fan": 0.0,
+        "A3_deltaic_plain": 0.9004,
+        "A4_hardpan_flat": 0.0
+      },
+      "top_archetype": "A3_deltaic_plain",
+      "top_archetype_native": "A3_deltaic_plain",
+      "calibrated_band": [
+        {
+          "feature": "slope_deg_mean",
+          "p10": 0.9477,
+          "p90": 3.7673,
+          "earth_fraction_in_band": 0.7982
+        },
+        {
+          "feature": "slope_deg_stdDev",
+          "p10": 0.5688,
+          "p90": 3.1848,
+          "earth_fraction_in_band": 0.7971
+        },
+        {
+          "feature": "slope_cv",
+          "p10": 0.5637,
+          "p90": 1.0475,
+          "earth_fraction_in_band": 0.7979
+        },
+        {
+          "feature": "roughness_m_mean",
+          "p10": 1.5634,
+          "p90": 5.9467,
+          "earth_fraction_in_band": 0.7978
+        },
+        {
+          "feature": "roughness_m_stdDev",
+          "p10": 0.5972,
+          "p90": 4.2718,
+          "earth_fraction_in_band": 0.7979
+        },
+        {
+          "feature": "roughness_cv",
+          "p10": 0.3479,
+          "p90": 0.9182,
+          "earth_fraction_in_band": 0.7976
+        },
+        {
+          "feature": "slope_log_ratio",
+          "p10": 0.2895,
+          "p90": 0.6783,
+          "earth_fraction_in_band": 0.7982
+        },
+        {
+          "feature": "roughness_rel",
+          "p10": 0.0003,
+          "p90": 0.0012,
+          "earth_fraction_in_band": 0.7978
+        }
+      ],
+      "reachable_fraction": 0.7978
+    },
+    "lunar_south_pole_all": {
+      "target_body": "Moon",
+      "rationale": "LOLA 90S window: cratered anorthositic highlands + PSR margins (SP-418).",
+      "tiles_used": 1600,
+      "archetype_mix": {
+        "A1_escarpment": 0.0081,
+        "A2_coarse_fan": 0.0475,
+        "A3_deltaic_plain": 0.5987,
+        "A4_hardpan_flat": 0.3457
+      },
+      "archetype_mix_native_uncalibrated": {
+        "A1_escarpment": 0.0893,
+        "A2_coarse_fan": 0.0,
+        "A3_deltaic_plain": 0.9107,
+        "A4_hardpan_flat": 0.0
+      },
+      "top_archetype": "A3_deltaic_plain",
+      "top_archetype_native": "A3_deltaic_plain",
+      "calibrated_band": [
+        {
+          "feature": "slope_deg_mean",
+          "p10": 0.9466,
+          "p90": 3.7727,
+          "earth_fraction_in_band": 0.799
+        },
+        {
+          "feature": "slope_deg_stdDev",
+          "p10": 0.5681,
+          "p90": 3.1963,
+          "earth_fraction_in_band": 0.7993
+        },
+        {
+          "feature": "slope_cv",
+          "p10": 0.5636,
+          "p90": 1.0496,
+          "earth_fraction_in_band": 0.7989
+        },
+        {
+          "feature": "roughness_m_mean",
+          "p10": 1.5624,
+          "p90": 5.9514,
+          "earth_fraction_in_band": 0.7989
+        },
+        {
+          "feature": "roughness_m_stdDev",
+          "p10": 0.596,
+          "p90": 4.2979,
+          "earth_fraction_in_band": 0.7992
+        },
+        {
+          "feature": "roughness_cv",
+          "p10": 0.3476,
+          "p90": 0.9195,
+          "earth_fraction_in_band": 0.799
+        },
+        {
+          "feature": "slope_log_ratio",
+          "p10": 0.2893,
+          "p90": 0.6788,
+          "earth_fraction_in_band": 0.799
+        },
+        {
+          "feature": "roughness_rel",
+          "p10": 0.0003,
+          "p90": 0.0012,
+          "earth_fraction_in_band": 0.7989
+        }
+      ],
+      "reachable_fraction": 0.799
+    },
+    "taurus_littrow_mare": {
+      "target_body": "Moon",
+      "rationale": "Apollo 17 high-Ti mare floor, albedo 0.07-0.10 (USGS PP1080 p.125).",
+      "tiles_used": 179,
+      "archetype_mix": {
+        "A1_escarpment": 0.0279,
+        "A2_coarse_fan": 0.0503,
+        "A3_deltaic_plain": 0.5809,
+        "A4_hardpan_flat": 0.3408
+      },
+      "archetype_mix_native_uncalibrated": {
+        "A1_escarpment": 0.4912,
+        "A2_coarse_fan": 0.0,
+        "A3_deltaic_plain": 0.5088,
+        "A4_hardpan_flat": 0.0
+      },
+      "top_archetype": "A3_deltaic_plain",
+      "top_archetype_native": "A3_deltaic_plain",
+      "calibrated_band": [
+        {
+          "feature": "slope_deg_mean",
+          "p10": 0.9532,
+          "p90": 3.7321,
+          "earth_fraction_in_band": 0.7904
+        },
+        {
+          "feature": "slope_deg_stdDev",
+          "p10": 0.5763,
+          "p90": 3.089,
+          "earth_fraction_in_band": 0.7905
+        },
+        {
+          "feature": "slope_cv",
+          "p10": 0.5649,
+          "p90": 1.0407,
+          "earth_fraction_in_band": 0.7915
+        },
+        {
+          "feature": "roughness_m_mean",
+          "p10": 1.5724,
+          "p90": 5.8988,
+          "earth_fraction_in_band": 0.7911
+        },
+        {
+          "feature": "roughness_m_stdDev",
+          "p10": 0.6023,
+          "p90": 4.1713,
+          "earth_fraction_in_band": 0.7911
+        },
+        {
+          "feature": "roughness_cv",
+          "p10": 0.3498,
+          "p90": 0.9102,
+          "earth_fraction_in_band": 0.7914
+        },
+        {
+          "feature": "slope_log_ratio",
+          "p10": 0.2907,
+          "p90": 0.675,
+          "earth_fraction_in_band": 0.7904
+        },
+        {
+          "feature": "roughness_rel",
+          "p10": 0.0003,
+          "p90": 0.0012,
+          "earth_fraction_in_band": 0.7911
+        }
+      ],
+      "reachable_fraction": 0.7909
+    }
+  },
+  "interpretation": {
+    "moon": "Cross-body similarity NOT defensible: AUC stays 0.999 after full quantile mapping, so the Western Desert candidate pool lacks the lunar highland class.",
+    "mars": "Calibration removes most of the gap (1.000 -> 0.911); the residual is a real geomorphic difference, so report the archetype mix rather than one similarity percentage.",
+    "recommended_next_step": "Widen the Earth candidate pool (Atacama, Iceland, McMurdo Dry Valleys, Death Valley, Namib, Arabian An Nafud) AND export Earth statistics at 118 m/200 m grids for a measured calibration factor; then re-run T1."
+  },
+  "top_site_quality": [
+    {
+      "tile_id": "EARTH_WD_137,568",
+      "approx_lat": 25.6884,
+      "approx_lon": 28.8684,
+      "slope_deg_mean": 1.6225,
+      "roughness_m_mean": 2.6323,
+      "slope_cv": 0.7564,
+      "albedo_mean": 0.2914,
+      "site_quality": 0.9498,
+      "archetype": "A3_deltaic_plain"
+    },
+    {
+      "tile_id": "EARTH_WD_140,563",
+      "approx_lat": 25.4608,
+      "approx_lon": 29.0141,
+      "slope_deg_mean": 1.2095,
+      "roughness_m_mean": 1.9821,
+      "slope_cv": 0.5707,
+      "albedo_mean": 0.2938,
+      "site_quality": 0.9462,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_131,572",
+      "approx_lat": 25.8724,
+      "approx_lon": 28.572,
+      "slope_deg_mean": 0.5428,
+      "roughness_m_mean": 0.9209,
+      "slope_cv": 0.7024,
+      "albedo_mean": 0.2462,
+      "site_quality": 0.9454,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_70,551",
+      "approx_lat": 24.9256,
+      "approx_lon": 25.5393,
+      "slope_deg_mean": 0.8484,
+      "roughness_m_mean": 1.3364,
+      "slope_cv": 0.6084,
+      "albedo_mean": 0.322,
+      "site_quality": 0.9448,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_70,550",
+      "approx_lat": 24.8804,
+      "approx_lon": 25.5398,
+      "slope_deg_mean": 0.6784,
+      "roughness_m_mean": 1.0986,
+      "slope_cv": 0.5549,
+      "albedo_mean": 0.3174,
+      "site_quality": 0.9441,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_68,553",
+      "approx_lat": 25.0149,
+      "approx_lon": 25.4391,
+      "slope_deg_mean": 0.7266,
+      "roughness_m_mean": 1.179,
+      "slope_cv": 0.5916,
+      "albedo_mean": 0.3475,
+      "site_quality": 0.9392,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_67,551",
+      "approx_lat": 24.924,
+      "approx_lon": 25.3908,
+      "slope_deg_mean": 0.7731,
+      "roughness_m_mean": 1.2407,
+      "slope_cv": 0.5877,
+      "albedo_mean": 0.33,
+      "site_quality": 0.939,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_70,549",
+      "approx_lat": 24.8353,
+      "approx_lon": 25.5403,
+      "slope_deg_mean": 0.8173,
+      "roughness_m_mean": 1.3053,
+      "slope_cv": 0.6433,
+      "albedo_mean": 0.3276,
+      "site_quality": 0.9387,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_68,551",
+      "approx_lat": 24.9246,
+      "approx_lon": 25.4403,
+      "slope_deg_mean": 0.931,
+      "roughness_m_mean": 1.4619,
+      "slope_cv": 0.6487,
+      "albedo_mean": 0.3288,
+      "site_quality": 0.9376,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_64,544",
+      "approx_lat": 24.6064,
+      "approx_lon": 25.2467,
+      "slope_deg_mean": 1.1063,
+      "roughness_m_mean": 1.7144,
+      "slope_cv": 0.5549,
+      "albedo_mean": 0.3006,
+      "site_quality": 0.9376,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_67,553",
+      "approx_lat": 25.0143,
+      "approx_lon": 25.3896,
+      "slope_deg_mean": 0.7205,
+      "roughness_m_mean": 1.1737,
+      "slope_cv": 0.5533,
+      "albedo_mean": 0.3467,
+      "site_quality": 0.936,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_71,551",
+      "approx_lat": 24.9261,
+      "approx_lon": 25.5888,
+      "slope_deg_mean": 1.1165,
+      "roughness_m_mean": 1.7462,
+      "slope_cv": 0.674,
+      "albedo_mean": 0.3323,
+      "site_quality": 0.9357,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_66,553",
+      "approx_lat": 25.0138,
+      "approx_lon": 25.3401,
+      "slope_deg_mean": 0.8096,
+      "roughness_m_mean": 1.2859,
+      "slope_cv": 0.5937,
+      "albedo_mean": 0.3407,
+      "site_quality": 0.9356,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_68,552",
+      "approx_lat": 24.9697,
+      "approx_lon": 25.4397,
+      "slope_deg_mean": 0.6994,
+      "roughness_m_mean": 1.1313,
+      "slope_cv": 0.5394,
+      "albedo_mean": 0.3417,
+      "site_quality": 0.9354,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_63,545",
+      "approx_lat": 24.651,
+      "approx_lon": 25.1967,
+      "slope_deg_mean": 1.3294,
+      "roughness_m_mean": 2.0641,
+      "slope_cv": 0.6623,
+      "albedo_mean": 0.2913,
+      "site_quality": 0.9344,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_75,511",
+      "approx_lat": 23.1218,
+      "approx_lon": 25.8036,
+      "slope_deg_mean": 1.3565,
+      "roughness_m_mean": 2.0966,
+      "slope_cv": 0.6337,
+      "albedo_mean": 0.3747,
+      "site_quality": 0.9331,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_67,552",
+      "approx_lat": 24.9692,
+      "approx_lon": 25.3902,
+      "slope_deg_mean": 0.8268,
+      "roughness_m_mean": 1.3237,
+      "slope_cv": 0.5875,
+      "albedo_mean": 0.3412,
+      "site_quality": 0.933,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_80,516",
+      "approx_lat": 23.3492,
+      "approx_lon": 26.0462,
+      "slope_deg_mean": 1.4222,
+      "roughness_m_mean": 2.2284,
+      "slope_cv": 0.6553,
+      "albedo_mean": 0.3466,
+      "site_quality": 0.9325,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_65,544",
+      "approx_lat": 24.607,
+      "approx_lon": 25.2961,
+      "slope_deg_mean": 1.6782,
+      "roughness_m_mean": 2.5804,
+      "slope_cv": 0.6868,
+      "albedo_mean": 0.2802,
+      "site_quality": 0.9324,
+      "archetype": "A3_deltaic_plain"
+    },
+    {
+      "tile_id": "EARTH_WD_136,543",
+      "approx_lat": 24.5607,
+      "approx_lon": 28.802,
+      "slope_deg_mean": 1.8969,
+      "roughness_m_mean": 2.9629,
+      "slope_cv": 0.6428,
+      "albedo_mean": 0.333,
+      "site_quality": 0.9321,
+      "archetype": "A3_deltaic_plain"
+    },
+    {
+      "tile_id": "EARTH_WD_135,545",
+      "approx_lat": 24.6516,
+      "approx_lon": 28.7539,
+      "slope_deg_mean": 1.4651,
+      "roughness_m_mean": 2.3096,
+      "slope_cv": 0.6745,
+      "albedo_mean": 0.331,
+      "site_quality": 0.9312,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_69,547",
+      "approx_lat": 24.7445,
+      "approx_lon": 25.492,
+      "slope_deg_mean": 0.8235,
+      "roughness_m_mean": 1.3051,
+      "slope_cv": 0.5576,
+      "albedo_mean": 0.3502,
+      "site_quality": 0.9308,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_67,556",
+      "approx_lat": 25.1497,
+      "approx_lon": 25.3878,
+      "slope_deg_mean": 0.7473,
+      "roughness_m_mean": 1.1969,
+      "slope_cv": 0.5544,
+      "albedo_mean": 0.2971,
+      "site_quality": 0.9305,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_140,564",
+      "approx_lat": 25.5059,
+      "approx_lon": 29.0148,
+      "slope_deg_mean": 0.795,
+      "roughness_m_mean": 1.3121,
+      "slope_cv": 0.5989,
+      "albedo_mean": 0.2299,
+      "site_quality": 0.9303,
+      "archetype": "A4_hardpan_flat"
+    },
+    {
+      "tile_id": "EARTH_WD_85,521",
+      "approx_lat": 23.5763,
+      "approx_lon": 26.2895,
+      "slope_deg_mean": 1.5557,
+      "roughness_m_mean": 2.3923,
+      "slope_cv": 0.6548,
+      "albedo_mean": 0.3239,
+      "site_quality": 0.93,
+      "archetype": "A3_deltaic_plain"
+    }
+  ],
+  "status": "earth_site_quality_ready; cross_body_match_needs_wider_earth_domain"
+}

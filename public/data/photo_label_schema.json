@@ -1,0 +1,139 @@
+{
+ "name": "terratwin_photo_labels_v1",
+ "purpose": "Training table for the learned photo-to-Earth model: one row per image with its geometry, sensor state and the Earth tile it should resolve to.",
+ "tile_geometry": {
+  "size_km": 5.0,
+  "meters_per_px": 100,
+  "px": 50,
+  "channels": [
+   "R",
+   "G",
+   "B",
+   "Hillshade"
+  ],
+  "earth_dem": "SRTMGL1_003 (30 m)",
+  "mars_dem": "HRSC/MOLA blend (200 m)",
+  "moon_dem": "LOLA (118 m)"
+ },
+ "columns": [
+  {
+   "name": "image_id",
+   "type": "str",
+   "required": true,
+   "rule": "unique; filename stem of the source image"
+  },
+  {
+   "name": "source_body",
+   "type": "enum",
+   "required": true,
+   "values": [
+    "Earth",
+    "Moon",
+    "Mars",
+    "Venus_radar",
+    "Titan_sar"
+   ],
+   "rule": "solid-body targets only; gas-giant cloud imagery is out of scope"
+  },
+  {
+   "name": "sensor",
+   "type": "str",
+   "required": true,
+   "example": "Mastcam-Z L; LROC NAC; PSMO Mars 2020 S-200; Sentinel-2 L2A"
+  },
+  {
+   "name": "is_raw_jpeg",
+   "type": "bool",
+   "required": true,
+   "rule": "true means gain/white-balance applied - blocks albedo reuse"
+  },
+  {
+   "name": "radiometric_albedo_mean",
+   "type": "float",
+   "required": false,
+   "rule": "only if the image is radiometrically calibrated; else null"
+  },
+  {
+   "name": "incidence_deg",
+   "type": "float",
+   "required": false
+  },
+  {
+   "name": "emission_deg",
+   "type": "float",
+   "required": false
+  },
+  {
+   "name": "phase_deg",
+   "type": "float",
+   "required": false
+  },
+  {
+   "name": "sun_elev_deg",
+   "type": "float",
+   "required": false,
+   "rule": "needed before any slope proxy is trusted"
+  },
+  {
+   "name": "gsd_m_per_px",
+   "type": "float",
+   "required": true,
+   "rule": "ground sample distance of the photo, drives the scale harmonisation"
+  },
+  {
+   "name": "target_tile_id",
+   "type": "str",
+   "required": true,
+   "rule": "the Earth tile the image should map to; must exist in terratwin_ml_ranked.csv"
+  },
+  {
+   "name": "target_archetype",
+   "type": "enum",
+   "required": true,
+   "values": [
+    "A1_escarpment",
+    "A2_coarse_fan",
+    "A3_deltaic_plain",
+    "A4_hardpan_flat"
+   ]
+  },
+  {
+   "name": "pair_label",
+   "type": "int",
+   "required": true,
+   "rule": "1 same geomorphic class, 0 different class (contrastive pairs)"
+  },
+  {
+   "name": "split_block",
+   "type": "str",
+   "required": true,
+   "rule": "0.81 deg spatial block key of target_tile_id - never random rows"
+  },
+  {
+   "name": "split_region",
+   "type": "str",
+   "required": true,
+   "rule": "province name; leave-region-out folds are built from this"
+  },
+  {
+   "name": "annotator_confidence",
+   "type": "float",
+   "required": false,
+   "rule": "0..1; drop rows below 0.6 from training, keep for evaluation"
+  }
+ ],
+ "validation_rules": [
+  "target_tile_id must join to the ranked tile table (7,180 Earth tiles)",
+  "radiometric_albedo_mean may be null only when is_raw_jpeg is true",
+  "images from a province held out for evaluation must not appear in training",
+  "no image may contribute more than 5% of one archetype class",
+  "gsd_m_per_px within 2 orders of magnitude of the tile geometry, else resample first",
+  "each split_block appears in exactly one fold"
+ ],
+ "honest_evaluation": [
+  "primary metric: leave-region-out top-1/top-5 archetype accuracy and median rank of the true tile, never in-region accuracy",
+  "report a domain-classifier AUC between photo features and Earth tile features; if it stays above ~0.9 the match is still sensor-bound and must be labelled so",
+  "report band width (lat/lon km) of the top-5 neighbours as the uncertainty measure"
+ ],
+ "note": "This schema is the contract the site's browser matcher will be replaced by. The current photo panel uses only features a single uncalibrated photograph can provide, and labels them as structural proxies."
+}

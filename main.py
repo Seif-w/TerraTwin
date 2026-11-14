@@ -1,9 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import pandas as pd
 import os
+import json
+
+import terratwin_data as tdata
+import ml_router
 
 app = FastAPI(
     title="TerraTwin API",
@@ -19,6 +24,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(ml_router.router)
 
 # ==========================================
 # 2. Data Models (عقد البيانات بين الفرونت والباك والـ AI)
@@ -151,7 +158,17 @@ PLANETARY_TRAVERSES = {
 
 @app.get("/")
 def health_check():
-    return {"status": "online", "service": "TerraTwin NASA Space Apps API"}
+    return {"status": "online", "service": "TerraTwin NASA Space Apps API",
+            "ui": "/app", "docs": "/docs"}
+
+
+@app.get("/app", response_class=HTMLResponse)
+def serve_ui():
+    """Serve the frontend from the API origin: one port, no CORS, works deployed."""
+    idx = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index1.html")
+    if not os.path.exists(idx):
+        raise HTTPException(status_code=404, detail="index1.html not found next to main.py")
+    return FileResponse(idx, media_type="text/html")
 
 @app.post("/api/analyze")
 def analyze_analogs(req: AnalysisRequest):
@@ -214,6 +231,8 @@ def analyze_analogs(req: AnalysisRequest):
         "target_body": target,
         "planetary_data": PLANETARY_TRAVERSES[target],
         "earth_analogs": results,
+        "data_source": "demo_hardcoded_scores",
+        "real_dataset_available": tdata.load_master() is not None,
         "comparison_metrics": {
             "labels": chart_labels,
             "earth": earth_vals,
@@ -230,17 +249,18 @@ def get_mars_traverse(limit: int = 100):
     if not os.path.exists(csv_path):
         return {"message": "Put best_interp.csv in the root folder to serve real NASA rover coordinates.", "points": []}
     
-    df = pd.read_csv(csv_path)
+    df = tdata.normalize_columns(pd.read_csv(csv_path))
     # أخذ عينة منتظمة عشان الخريطة متهنجش
     step = max(1, len(df) // limit)
     sampled = df.iloc[::step]
     
     points = []
     for _, row in sampled.iterrows():
-        if pd.notna(row.get("planetocentric latitude")) and pd.notna(row.get("longitude")):
+        lat = row.get("planetocentric_latitude")
+        if pd.notna(lat) and pd.notna(row.get("longitude")):
             points.append({
                 "sol": int(row.get("sol", 0)),
-                "lat": float(row["planetocentric latitude"]),
+                "lat": float(lat),
                 "lng": float(row["longitude"]),
                 "elevation": float(row.get("elevation", 0))
             })
