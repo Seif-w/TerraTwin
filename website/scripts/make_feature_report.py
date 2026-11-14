@@ -136,7 +136,7 @@ def main():
         "",
         "Regenerate: `python scripts/make_feature_report.py`",
     ]
-    (ROOT / "FEATURE_REPORT.md").write_text("\n".join(head + lines + tail) + "\n")
+    (ROOT.parent / "docs" / "FEATURE_REPORT.md").write_text("\n".join(head + lines + tail) + "\n")
     print("wrote FEATURE_REPORT.md", strongest, weakest, best_counts)
 
 

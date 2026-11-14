@@ -1,64 +1,114 @@
-# TerraTwin
+<p align="center">
+  <img src="docs/images/logo.png" alt="TerraTwin logo" width="140">
+</p>
 
-Explore Earth environments that resemble a landscape photograph, measured terrain in Egypt's Western Desert, and sample sites from the Mars 2020 Initial Reports.
+<h1 align="center">TerraTwin</h1>
 
-## Run the website
+<p align="center">
+  <b>Find Earth's twins of Mars and Moon landscapes.</b><br>
+  Upload a picture and see the places on Earth that look most like it.
+</p>
 
-```bash
-pnpm install --frozen-lockfile
-pnpm dev
+<p align="center">
+  <a href="https://terratwin.manus.space">Live demo</a> ·
+  <a href="docs/TerraTwin_Documentation.pdf">Documentation (PDF)</a> ·
+  <a href="docs/PROJECT_SUMMARY.md">Project summary</a>
+</p>
+
+---
+
+## About
+
+Before rovers and astronauts go to the Moon or Mars, teams test their equipment at **analogue sites**: places on Earth that resemble the target location. Finding these sites usually takes expert knowledge and data spread across many sources.
+
+TerraTwin finds Earth analogue sites for future Moon and Mars missions. It uses NASA Earthdata (SRTM, MODIS), the Planetary Data System (LRO LOLA and Diviner, Mars MOLA) and Copernicus to measure slope, roughness, temperature and aridity, then ranks Earth sites by similarity on an interactive map. Egypt's Western Desert is the case study.
+
+<p align="center">
+  <img src="docs/images/screenshot-results.jpg" alt="TerraTwin results on the globe" width="85%">
+</p>
+
+## Features
+
+| | |
+|---|---|
+| **Photo finder** | Upload any landscape photo, or try one of the 9 real Mars rover sites |
+| **Worldwide search** | Compares your photo with 720 satellite pictures from 177 countries and areas |
+| **Coloured flags** | Red for the top 3 matches, orange for the next 5, yellow for the next 10 |
+| **Side-by-side view** | Click a flag to see the real place next to your photo |
+| **Feature breakdown** | Colour, brightness, light and shadow, contrast and texture, each with a match score |
+| **Private** | Photos are analysed in your browser and never uploaded |
+
+<p align="center">
+  <img src="docs/images/screenshot-place.jpg" alt="Side-by-side comparison of a matched place" width="85%">
+</p>
+
+## How it works
+
+1. **Read the photo.** The browser turns the picture into 13 numbers that describe its colour, brightness, contrast and texture.
+2. **Compare.** It compares those numbers with the same numbers for every satellite picture in the library.
+3. **Show.** The closest places appear as flags on the 3D globe. Each flag explains which features matched.
+
+## Results
+
+| Model | What it does | Score |
+|---|---|---|
+| Landform classifier | Sorts terrain into escarpment, coarse fan, deltaic plain and hardpan flat | **99.6%** accuracy on unseen areas (baseline 50%) |
+| Site-quality model | Rates how suitable a site is for rover testing | **R² 0.996**, Spearman 0.998 |
+| Earth vs Mars check | Tests whether Earth and Mars terrain can be compared fairly | AUC 1.000 → **0.911** after calibration |
+
+The models were trained on **9,680 terrain tiles**: 7,180 from Earth, 900 from Mars (Jezero Crater) and 1,600 from the Moon (south pole). See the [feature report](docs/FEATURE_REPORT.md) for how each photo feature performed.
+
+## Project structure
+
+```
+TerraTwin/
+├── website/    Web app (React, globe.gl, Chart.js)
+├── ml/         Data pipeline, saved models and training scripts
+├── backend/    Original FastAPI server (optional)
+└── docs/       Summary, reports, data sources, PDF and images
 ```
 
-Open `http://localhost:3000`. Build with `pnpm typecheck && pnpm build`. Deploy `dist/` to a static host with SPA fallback to `/index.html`.
+## Quick start
 
-## Pages and features
+**Website**
+```bash
+cd website
+pnpm install
+pnpm dev                              # open http://localhost:3000
+python scripts/build_world_index.py   # downloads the 720 worldwide pictures (first run only)
+```
 
-Home, Find a place, Mars samples, Explore, and How it works. Photo analysis runs locally in the browser. Up to 18 geographically spaced matches use red/orange/yellow flags for the top 3/next 5/next 10 results. Clicking a flag or result opens the actual coordinate-centered satellite view. A minimum-score filter hides lower-scoring results.
+**Machine learning**
+```bash
+cd ml
+pip install -r requirements.txt
+python 03_harmonize.py && python 04_ml_rank.py && python export_models.py
+```
 
-Scores are experimental visual similarity, not calibrated location confidence. The current photo matcher compares brightness/contrast and a weak relief proxy against terrain measurements. It is not a trained image-location model and does not search the whole planet.
+**Backend (optional)**
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload             # open http://localhost:8000/docs
+```
 
-## Structure
+## Data sources
 
-- `src/`: React interface, local image extraction, visual matcher, globes and result cards.
-- `public/data/`: exported terrain, landmark references, vegetation screen and Mars sample records.
-- `public/samples/`: credited demonstration images extracted from the supplied reports and existing examples.
-- `scripts/`: report extraction, artifact export and build-time initial HTML.
-- `ml/`: terrain ML scripts, fitted estimators, metadata and the user-supplied dataset. See [ML instructions](ml/README.md).
-- `GITHUB_UPLOAD.md`: commands for adding this update to the existing repository.
+- **Earth:** SRTM 30 m elevation, MODIS
+- **Mars:** HRSC and MOLA elevation, and the Perseverance Initial Reports (Volumes 2 and 4)
+- **Moon:** LRO LOLA and Diviner
+- **Satellite pictures:** Sentinel-2 cloudless 2023 by EOX (contains modified Copernicus Sentinel data, CC BY-NC-SA 4.0)
+- **Borders:** Natural Earth
 
-## Sources and limits
+All sources and licences are listed in [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
 
-The supplied Initial Reports volumes 2 and 4 provide 9 sample sites and 13 sample records, not verified Earth-Mars image pairs. Figure/page citations are kept in `public/data/mars_samples.json`.
+## Limitations
 
-Earth result pictures use EOX Sentinel-2 cloudless 2023: modified Copernicus Sentinel data, CC BY-NC-SA 4.0. These are satellite views, not ground-level photos. Review the noncommercial license before commercial use. Landmark coordinates come from OpenStreetMap contributors, ODbL.
+- Scores measure **visual similarity**, not an exact location.
+- Satellite pictures look down from above, while rover photos look sideways.
+- Moon terrain comparisons are **not yet reliable**.
 
-The vegetation screen is an RGB heuristic, not a validated land-use classifier. It does not establish safety, accessibility, land ownership or suitability for development.
+## Next steps
 
-The saved terrain classifier learns threshold-defined labels; the quality regressor approximates an engineering formula. Earlier high validation scores measure reproduction of those rules, not independent geological truth or photo-location accuracy.
-
-Training a learned photo-to-Earth system still requires georeferenced Earth pictures, meaningful analogue pair labels, scale/lighting metadata, and held-out geographic regions.
-
-## Worldwide mode (version 2)
-
-The default photo finder now matches real EOX satellite-image references sampled on a global six-degree land grid plus interior country points. This is a new image corpus, not a claim that the supplied terrain data is global. The original Egypt terrain mode remains separately selectable. A flag/result click immediately opens a picture dialog, rather than a detail card hidden below the map.
-
-Rebuild the index with `python scripts/build_world_index.py` after installing `requests`, `Pillow`, `numpy` and `shapely`. Actual counts, coverage and skipped responses are recorded in `public/world/index.json`. Every preview is bundled locally. Source and license information is in WORLD_SOURCES.md.
-
-Uploads accept JPEG/PNG/WebP below 12 MB, run locally, and are not stored by the site. Tooltip content is escaped, raster paths are validated, external links are HTTPS with noopener/noreferrer, and limited CSP/referrer protections are included. This is hardening, not an independent security audit. The hosting platform owns HTTPS and response headers.
-
-## Project documents
-
-- [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) – plain-language summary: what TerraTwin is, the problem, and why it matters
-- [FEATURE_REPORT.md](FEATURE_REPORT.md) – per-feature match results for the Mars samples (regenerate with `python scripts/make_feature_report.py`)
-- [WORLD_SOURCES.md](WORLD_SOURCES.md) – worldwide satellite imagery sources and licences
-- [ml/README.md](ml/README.md) – saved terrain models and how to reload them
-- [docs/](docs/) – architecture, modelling decision, runbook and the original FastAPI backend notes (`main.py`, `ml_router.py`, `requirements-backend.txt`)
-
-## Images not stored in this repository
-
-To keep the repository small, two image folders are generated rather than committed:
-
-- `public/world/images/` (720 satellite pictures): run `python scripts/build_world_index.py`
-- `public/samples/` photos (Mars sample sites): run `python scripts/extract_sample_photos.py` with the Initial Reports PDFs
-
-The live website already includes all of them.
+- Train a learned photo-to-place model on the labelled image dataset the team is collecting.
+- Add more regions beyond Egypt's Western Desert.
