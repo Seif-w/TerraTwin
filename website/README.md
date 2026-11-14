@@ -23,10 +23,14 @@ pnpm build      # production files in dist/
 
 ## Rebuild the pictures
 
-These pictures are not stored in the repository, so the scripts below rebuild them.
+Worldwide reference pictures and the extra demonstration photos are stored together in `assets/reference-images.tar.gz` to keep the repository tidy. `pnpm build` or `npm run build` automatically restores them. The scripts below are available if you want to regenerate the source data.
 
 ```bash
 python scripts/build_world_index.py      # 720 worldwide satellite pictures
 python scripts/extract_sample_photos.py  # Mars sample photos (needs the Initial Reports PDFs)
 python scripts/make_feature_report.py    # updates docs/FEATURE_REPORT.md
 ```
+
+## Deploy on Vercel
+
+Import `Seif-w/TerraTwin` and set the Root Directory to **website**. The included `vercel.json` supplies the build settings and page routing. The build restores the bundled pictures automatically. This static website does not require the optional Python backend or external AI credentials.
